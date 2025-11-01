@@ -10,7 +10,7 @@ sudo docker compose up -d --pull=missing
 
 # Charger les variables depuis guacamole.env
 if [ -f guacamole.env ]; then
-    sudo export $(grep -v '^#' guacamole.env | xargs)
+    export $(grep -v '^#' guacamole.env | xargs)
 else
     echo "Erreur : fichier guacamole.env introuvable"
     exit 1
