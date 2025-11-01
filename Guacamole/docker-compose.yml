@@ -24,20 +24,20 @@ services:
     expose:
       - 4822
 
-    guacamole:
-      image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
-      container_name: guacamole
-      hostname: guacamole
-      restart: always
-      env_file:
-        - guacamole.env
-      depends_on:
-        - guacamole_db
-        - guacd
-      ports:
-        - ${GUACAMOLE_PORT:-8080}:8080
-      links:
-        - guacd
-      environment:
-        - MYSQL_HOSTNAME=${MYSQL_HOSTNAME:-guacamole_db}
-        - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
+  guacamole:
+    image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
+    container_name: guacamole
+    hostname: guacamole
+    restart: always
+    env_file:
+      - guacamole.env
+    depends_on:
+      - guacamole_db
+      - guacd
+    ports:
+      - ${GUACAMOLE_PORT:-8080}:8080
+    links:
+      - guacd
+    environment:
+      - MYSQL_HOSTNAME=${MYSQL_HOSTNAME:-guacamole_db}
+      - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
