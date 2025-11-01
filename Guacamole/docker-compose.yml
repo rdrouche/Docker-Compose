@@ -1,0 +1,43 @@
+services:
+  guacamole_db:
+    image: mariadb:${MARIADB_VERSION:-11}
+    container_name: guacamole_db
+    hostname: guacamole_db    
+    restart: always
+    volumes:
+      - ./guacamole_db:/var/lib/mysql
+    env_file:
+      - guacamole.env
+    expose:
+      - 3306
+    
+  guacd:
+    image: guacamole/guacd:${GUACD_VERSION:-latest}
+    container_name: guacd
+    hostname: guacd    
+    restart: always
+    env_file:
+      - guacamole.env
+    volumes:
+      - ./guacd_drive:/drive:rw 
+      - ./guacd_record:/record:rw 
+    expose:
+      - 4822
+
+    guacamole:
+      image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
+      container_name: guacamole
+      hostname: guacamole
+      restart: always
+      env_file:
+        - guacamole.env
+      depends_on:
+        - guacamole_db
+        - guacd
+      ports:
+        - ${GUACAMOLE_PORT:-8080}:8080
+      links:
+        - guacd
+      environment:
+        - MYSQL_HOSTNAME=${MYSQL_HOSTNAME:-guacamole_db}
+        - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
