@@ -17,7 +17,9 @@ fi
 sudo rm -f ${OUTPUT_FILE}
 
 # Lire le fichier, ignorer les lignes vides et commentées, concaténer avec des ";"
-CONFIG_VALUE=$(grep -v '^\s*#' "$CONFIG_FILE" | grep -v '^\s*$' | tr '\n' ';' | sed 's/;*$//')
+#CONFIG_VALUE=$(grep -v '^\s*#' "$CONFIG_FILE" | grep -v '^\s*$' | tr '\n' ';' | sed 's/;*$//')
+CONFIG_VALUE=$(grep -v '^\s*#' "$CONFIG_FILE" | grep -v '^\s*$' | tr '\n' ' ' | sed 's/  */ /g')
+
 
 # Générer le fichier .env
 cat > "$OUTPUT_FILE" <<EOF
