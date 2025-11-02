@@ -15,6 +15,15 @@ puma['worker_processes'] = 1
 prometheus_monitoring['enable'] = true
 gitlab_exporter['enable'] = true
 
+# Depot image Docker (registy)
+#registry['enable'] = true
+#registry_external_url 'https://registry.domain.tld'
+#gitlab_rails['registry_enabled'] = true
+#gitlab_rails['registry_path'] = "/var/opt/gitlab/gitlab-rails/shared/registry"
+#registry_nginx['enable'] = true
+#registry_nginx['ssl_certificate'] = "/etc/gitlab/registrydomaintld.crt"
+#registry_nginx['ssl_certificate_key'] = "/etc/gitlab/registrydomaintld.key"
+
 #SAML (ADFS)
 gitlab_rails['omniauth_allow_single_sign_on'] = ['saml']
 gitlab_rails['omniauth_block_auto_created_users'] = true
