@@ -1,7 +1,7 @@
 services:
   gitlab:
     image: 'gitlab/gitlab-ce:latest'
-    restart: alway
+    restart: always
     hostname: 'git.your-domain.com'
     env_file:
       - gitlab.env

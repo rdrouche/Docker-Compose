@@ -13,6 +13,9 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
   exit 1
 fi
 
+# Suppression di fichier existant
+sudo rm -f ${OUTPUT_FILE}
+
 # Lire le fichier, ignorer les lignes vides et commentées, concaténer avec des ";"
 CONFIG_VALUE=$(grep -v '^\s*#' "$CONFIG_FILE" | grep -v '^\s*$' | tr '\n' ';' | sed 's/;*$//')
 
