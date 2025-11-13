@@ -27,7 +27,6 @@ services:
     env_file:
       - ./env_vars/.env_db_pgsql
       - ./env_vars/.env_srv
-      - ./zabbix.env
     secrets:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
@@ -74,12 +73,11 @@ services:
     env_file:
       - ./env_vars/.env_db_pgsql
       - ./env_vars/.env_web
-      - ./zabbix.env
     secrets:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
     depends_on:
-      - postgresql-server
+      - postgres-server
       - zabbix-server
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
@@ -116,7 +114,6 @@ services:
     tmpfs: /tmp
     env_file:
       - /env_vars/.env_db_pgsql
-      - ./zabbix.env
     secrets:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
@@ -142,7 +139,6 @@ services:
     tmpfs: /tmp
     env_file:
       - ./env_vars/.env_agent
-      - ./zabbix.env
     networks:
       zbx_net_backend:
         aliases:
