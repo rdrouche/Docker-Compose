@@ -11,6 +11,7 @@ Ce dépôt fournit une stack entièrement opérationnelle pour déployer GLPI vi
 * ⚡ Redis pour le cache (optionnel)
 * ⏱️ Cron GLPI (exécution automatique)
 
+
 [docker-compose.yml](https://git.rdr-it.com/root/docker-compose/-/tree/main/GLPI)
 
 ## ⚙️ Prérequis
@@ -57,6 +58,7 @@ bash <(wget -qO- https://git.rdr-it.com/root/scripts/-/raw/master/Linux/rdr-it/g
 2️⃣ Modifier le fichier .env avec vos valeurs.
 
 ```console
+cp sample.env .env
 nano .env
 ```
 
