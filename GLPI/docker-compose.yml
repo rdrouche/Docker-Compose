@@ -1,0 +1,88 @@
+services:
+  glpi-web:
+    image: rdrit/glpi
+    restart: ${RESTART_POLICY:-always}
+    networks:
+      - glpi-net
+    env_file:
+      - .env
+    volumes:
+      - ./data/glpi:/var/www/glpi
+    ports:
+      - 80:80
+    depends_on:
+      glpi-db:
+        condition: service_healthy
+      glpi-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  glpi-cron:
+    image: rdrit/glpi
+    restart: ${RESTART_POLICY:-always}
+    networks:
+      - glpi-net
+    env_file:
+      - .env
+    depends_on:
+      glpi-web:
+        condition: service_healthy
+    user: "www-data"
+    volumes:
+      - ./data/glpi:/var/www/glpi
+    command: ["bash", "-c", "while true; do php /var/www/glpi/front/cron.php; sleep 60; done"]
+
+  glpi-db:
+    image: mariadb:11
+    restart: ${RESTART_POLICY:-always}
+    networks:
+      - glpi-net
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_allowed_packet=512M
+      - --transaction-isolation=READ-COMMITTED
+      - --skip-log-bin
+      # Si replication commenter - --skip-log-bin et decommenter la ligne ci-dessous
+      #- --binlog-format=ROW
+      - --innodb_buffer_pool_size=1G
+      - --innodb_log_buffer_size=256M
+      - --innodb_log_file_size=1G
+      - --innodb_file_per_table=1
+      - --table_open_cache=4000
+      - --tmp_table_size=256M
+      - --max_heap_table_size=256M
+    volumes:
+      - ./data/mariadb:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${GLPI_DB_NAME}
+      - MYSQL_USER=${GLPI_DB_USER}
+      - MYSQL_PASSWORD=${GLPI_DB_PASSWORD}
+      - MARIADB_AUTO_UPGRADE={$MARIADB_AUTO_UPGRADE:-1}
+      - TZ=${GLPI_TIMEZONE}
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized" ]
+      start_period: 20s
+      start_interval: 10s
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  glpi-redis:
+    image: redis:latest
+    restart: ${RESTART_POLICY:-always}
+    networks:
+      - glpi-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  glpi-net:
