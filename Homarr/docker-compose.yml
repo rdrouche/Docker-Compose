@@ -1,0 +1,42 @@
+services:
+  homarr:
+    container_name: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
+    restart: ${RESTART_POLICY:-always}
+    networks:
+      - homarr-net
+    volumes:
+      #- /var/run/docker.sock:/var/run/docker.sock # Optional, only if you want docker integration
+      - ./homarr/appdata:/appdata
+    env_file:
+      - .env
+    environment:
+      - SECRET_ENCRYPTION_KEY=6fb4c57d00005f5ed88277e64e8ca32433935fe718dd20b40edb31f70132104f
+    ports:
+      - ${PORT_EXPOSE}:7575
+    depends_on:
+      - homarr-postgre
+  homarr-postgre:
+    image: postgres:18
+    restart: ${RESTART_POLICY:-always}
+    networks:
+      - homarr-net
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+  homarr-redis:
+    image: redis:latest
+    restart: ${RESTART_POLICY:-always}
+    networks:
+      - homarr-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  homarr-net:
