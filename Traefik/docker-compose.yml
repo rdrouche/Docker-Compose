@@ -1,0 +1,34 @@
+services:
+  traefik:
+    image: traefik:${TRAEFIK_TAG:-v3.6}
+    restart: always
+    networks:
+      - proxy
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--providers.file.filename=/dynamic/tls.yaml"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.docker.network=proxy"
+      - "--log.level=DEBUG"
+      - "--accesslog=true"
+      - "--accesslog.filePath=/logs/access.log"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--entryPoints.websecure.http.tls=true"
+      - "--entryPoints.web.forwardedHeaders.insecure=true"
+      - "--entryPoints.websecure.forwardedHeaders.insecure=true"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      # Add the following volumes
+      - "./certs:/certs:ro"
+      - "./dynamic:/dynamic:ro"
+
+networks:
+  proxy:
+    external: true
