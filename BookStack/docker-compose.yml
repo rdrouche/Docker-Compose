@@ -1,0 +1,63 @@
+services:
+  bookstack:
+    image: linuxserver/bookstack:${BOOKSTACK_TAG:-25.11.5}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    env_file:
+      - .env
+    networks:
+      - bookstack-net 
+    volume:
+      - ./data/bookstack:/config
+    ports:
+      - ${APP_POST:80}
+
+  bookstack-db:
+    image: mariadb:${MARIADB_TAG:-11}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    networks:
+      - bookstack-net
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_allowed_packet=512M
+      - --transaction-isolation=READ-COMMITTED
+      - --skip-log-bin
+      # Optimisation mémoire pour conteneur
+      - --innodb-buffer-pool-size=512M
+      - --innodb-log-file-size=64M
+      - --innodb-flush-method=O_DIRECT
+      # Réduction de la consommation de RAM
+      - --max-connections=50
+      - --tmp-table-size=32M
+      - --max-heap-table-size=32M
+      - --table-open-cache=200
+      - --thread-cache-size=8
+      # Buffers par connexion (plus petits = moins de swap)
+      - --sort-buffer-size=2M
+      - --read-buffer-size=1M
+      - --join-buffer-size=2M
+      # Optionnelles
+      - --query-cache-type=0
+      - --query-cache-size=0 
+    environment:
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MARIADB_AUTO_UPGRADE={$MARIADB_AUTO_UPGRADE:-1}
+    volumes:
+      - ./data/mariadb:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized" ]
+      start_period: 20s
+      start_interval: 10s
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+networks:
+  bookstack-net:
+
+
+    
