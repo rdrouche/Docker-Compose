@@ -6,7 +6,7 @@ services:
       - .env
     networks:
       - bookstack-net 
-    volume:
+    volumes:
       - ./data/bookstack:/config
     ports:
       - ${APP_POST:80}
