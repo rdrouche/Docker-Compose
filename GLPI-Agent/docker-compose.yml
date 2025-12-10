@@ -1,0 +1,11 @@
+services:
+  glpi-agent:
+    container_name: docker-glpi-agent
+    image: rdrit/glpi-agent:1.15
+    ports:
+      - 62354:62354
+    volumes:
+      - ./config/toolbox.yaml:/etc/glpi-agent/toolbox.yaml:rw
+    environment:
+      - GLPI_SERVER=https://glpi.domain.tld
+      - GLPI_SERVER_NO_SSL_CHECK=true
