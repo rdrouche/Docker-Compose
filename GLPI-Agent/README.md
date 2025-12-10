@@ -69,7 +69,7 @@ services:
 docker run -d \
   --name docker-glpi-agent \
   -p 62354:62354 \
-  -e GLPI_SERVER=https://helpme-noauth.bourges.fr \
+  -e GLPI_SERVER=https://glpi.domain.tld \
   -e GLPI_SERVER_NO_SSL_CHECK=true \
   glpiagent
 ```
