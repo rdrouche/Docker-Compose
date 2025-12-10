@@ -83,7 +83,7 @@ Retrouvez le tutoriel complet pour configurer votre GLPI Agent Docker sur notre 
 
 👉 https://rdr-it.com/glpi-11-configurer-inventaire-automatique-reseau-glpi-agent/
 
-##💡 Notes
+## 💡 Notes
 
 Le script entrypoint.sh initialise la configuration, vérifie les variables d’environnement et lance l’agent avec les paramètres adaptés.
 
