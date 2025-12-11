@@ -76,6 +76,27 @@ docker run -d \
   glpiagent
 ```
 
+## 📦 Depuis le dépôt Git
+
+Le dépôt se trouve à cette adresse : [git.rdr-it.com/root/docker-compose/-/tree/main/GLPI-Agent]([https://](https://git.rdr-it.com/root/docker-compose/-/tree/main/GLPI-Agent))
+
+Sur votre serveur, aller dans le dossier où vous souhaitez mettre les fichiers du conteneur.
+
+Cloner le dossier GLPI-Agent
+
+```console
+bash <(wget -qO- https://git.rdr-it.com/root/scripts/-/raw/master/Linux/rdr-it/get-docker-compse/get.sh) GLPI-Agent
+```
+
+Editer le fichier docker-compose.yml et adapter les variables.
+
+Démarrer le conteneur GLPI-Agent
+
+```console
+docker compose up -d
+```
+
+Aller ensuite sur l'interface Web (http://ip-host-dicker:62354) de l'agent pour configurer la découverte réseau.
 
 ## 🔗 Documentation et tutoriels
 
