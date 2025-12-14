@@ -1,7 +1,7 @@
 services:
   guacamole-db:
     image: postgres:18-alpine
-    restart: ${RESTART-POLICY:-unless-stopped}
+    restart: ${RESTART_POLICY:-unless-stopped}
     environment:
       - POSTGRES_DB=${GUACAMOLE_DB_NAME}
       - POSTGRES_USER=${GUACAMOLE_DB_USER}
@@ -14,7 +14,7 @@ services:
 
   guacamole-guacd:
     image: guacamole/guacd:${GUACD_VERSION:-latest}
-    restart: ${RESTART-POLICY:-unless-stopped}
+    restart: ${RESTART_POLICY:-unless-stopped}
     user: root
     env_file:
       - .env
@@ -26,14 +26,17 @@ services:
     
   guacamole-web:
     image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
-    restart: ${RESTART-POLICY:-unless-stopped}
+    restart: ${RESTART_POLICY:-unless-stopped}
     user: root
     env_file:
       - .env
     networks:
       - guacamole-net
-    port:
+    ports:
       - ${GUACAMOLE_PORT:-8080}:8080
     depends_on:
-      - guacamole_db
-      - guacd
+      - guacamole-db
+      - guacamole-guacd
+
+networks:
+  guacamole-net:
