@@ -37,6 +37,8 @@ services:
     depends_on:
       - guacamole-db
       - guacamole-guacd
+    volumes:
+      - ./data/guacd/record:/record:rw
 
 networks:
   guacamole-net:
