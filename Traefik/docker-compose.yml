@@ -1,3 +1,5 @@
+# Before starting the container, create the proxy network on the Docker host server using the command: `docker network create proxy`
+
 services:
   traefik:
     image: traefik:${TRAEFIK_TAG:-v3.6}
@@ -11,14 +13,19 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedByDefault=false"
       - "--providers.docker.network=proxy"
+      # Logging config
       - "--log.level=DEBUG"
-      - "--accesslog=true"
+      - "--accesslog=false"
       - "--accesslog.filePath=/logs/access.log"
+      # HTTP Config
       - "--entryPoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
+      # HTTPS Config
       - "--entryPoints.websecure.http.tls=true"
       - "--entryPoints.web.forwardedHeaders.insecure=true"
-      - "--entryPoints.websecure.forwardedHeaders.insecure=true"
+      # Behavior
+      - "--entryPoints.websecure.forwardedHeaders.insecure=true" # Allows the transfer of HTTP headers from a proxy server in front
+      - "--serversTransport.insecureSkipVerify=true" # Allows you to bypass verification of the target's SSL certificate (proxy_ssl_verify off)
     ports:
       - "80:80"
       - "443:443"
