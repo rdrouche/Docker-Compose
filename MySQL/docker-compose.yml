@@ -1,0 +1,11 @@
+services:
+  mysql:
+    image: mariadb:${DB_VERSION:-8}
+    container_name: ${NAME_CONTAINER:-mysql}
+    restart: always
+    volumes:
+      - ./data:/var/lib/mysql
+    env_file:
+      - .env
+    ports:
+      - '${PORT_EXPOSE:-3306}:3306'
