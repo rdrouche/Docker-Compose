@@ -1,0 +1,90 @@
+# Change 3 Passwords in this file:
+# Generate passwords with 'openssl rand -hex 64'
+# 
+# 1. The database password in the environment variable POSTGRES_PASSWORD
+# 2. The redis password in the command redis-server --requirepass your-redis-password-here
+# 3. The jwt secret in the environment variable JWT_SECRET
+#
+#
+# Change 2 URL areas in this file:
+# 1. Setup your CORS_ORIGIN to what url you will use for accessing PatchMon frontend url
+# 2. Setup your SERVER_PROTOCOL, SERVER_HOST and SERVER_PORT to what you will use for linux agents to access PatchMon
+#
+# This is generally the same as your CORS_ORIGIN url , in some cases it might be different - SERVER_* variables are used in the scripts for Server connection.
+# You can also change this in the front-end but in the case of docker-compose - it is overwritten by the variables set here.
+
+name: patchmon
+
+services:
+  database:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - patchmon-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 5s
+      retries: 7
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    env_file:
+      - .env
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - patchmon-internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 3s
+      timeout: 5s
+      retries: 7
+
+  backend:
+    image: ghcr.io/patchmon/patchmon-backend:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      CORS_ORIGIN: ${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DB: 0
+      # Assets directory for custom branding (logos, favicons)
+      ASSETS_DIR: /app/assets
+    volumes:
+      - ./data/agent_files:/app/agents
+      - ./data/branding_assets:/app/assets
+    networks:
+      - patchmon-internal
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    image: ghcr.io/patchmon/patchmon-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data/branding_assets:/usr/share/nginx/html/assets
+    networks:
+      - patchmon-internal
+    depends_on:
+      backend:
+        condition: service_healthy
+
+networks:
+  patchmon-internal:
+    driver: bridge
