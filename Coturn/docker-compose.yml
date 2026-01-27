@@ -1,0 +1,11 @@
+services:
+  coturn:
+    image: coturn/coturn
+    restart: always
+    network_mode: host
+    ports:
+      - "3478:3478"
+      - "3478:3478/udp"
+      #- "8080:8080"
+    volumes:
+      - ./turnserver.conf:/etc/coturn/turnserver.conf
