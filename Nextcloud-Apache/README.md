@@ -1,7 +1,3 @@
----
-title: "readme-temp"
----
-
 # Nextcloud + OnlyOffice avec Docker Compose
 
 Ce dépôt permet de déployer une instance Nextcloud complète avec :
