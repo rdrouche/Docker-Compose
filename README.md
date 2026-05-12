@@ -19,6 +19,7 @@ cd /containers/<app-name>
 Entrer la ligne de commande pour récupérer les fichiers de l'application que vous souhaitez déployer
 
 ```Bash
-bash <(wget -qO- https://git.rdr-it.com/root/scripts/-/raw/master/Linux/rdr-it/get-docker-compse/get.sh) <app-name>
+
+bash <(wget -qO- https://forge.rdr-it.com/romain/Docker-Compose/raw/branch/main/get.sh) <app-name>
 
 ```
