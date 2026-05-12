@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${VERSION}
+    restart: always
+    volumes:
+      - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,z
+      - ./pipeline:/usr/share/logstash/pipeline/
+    ports:
+      - 5044:5044
+    #environment:
+      #LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - elastic
+    #logging:
+      #driver: none
+      #options:
+      #  max-size: 100m
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 256m
+
+networks:
+  elastic:
+    external: true

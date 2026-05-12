@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+    jenkins:
+        image: jenkins/jenkins:latest
+        privileged: true
+        user: root
+        ports:
+            - 35080:8080
+        container_name: jenkins_sys
+        volumes:
+            - ./jenkins_data:/var/jenkins_home
+        restart: always
+        deploy:
+            resources:
+                limits:
+                    memory: 1g

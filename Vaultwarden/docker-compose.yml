@@ -1,0 +1,24 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    ports:
+     - 8080:80
+    volumes:
+     - ./data:/data:rw
+    environment:
+     - ADMIN_TOKEN=${ADMIN_TOKEN}
+     - WEBSOCKET_ENABLED=${WEBSOCKET_ENABLED}
+     - SIGNUPS_ALLOWED=${SIGNUPS_ALLOWED}
+     - SMTP_HOST=${SMTP_HOST}
+     - SMTP_FROM=${SMTP_FROM}
+     - SMTP_FROM_NAME=${SMTP_FROM_NAME}
+     - SMTP_PORT=${SMTP_PORT}
+     - SMTP_SSL=${SMTP_SSL}
+     - EMERGENCY_ACCESS_ALLOWED=${EMERGENCY_ACCESS_ALLOWED}
+     - SIGNUPS_VERIFY=${SIGNUPS_VERIFY}
+     - SIGNUPS_DOMAINS_WHITELIST=${SIGNUPS_DOMAINS_WHITELIST}
+     #- SMTP_USERNAME=${SMTP_USERNAME}
+     #- SMTP_PASSWORD=${SMTP_PASSWORD}
+     - DOMAIN=${DOMAIN}
