@@ -1,0 +1,20 @@
+---
+configuration:
+  agent_home_navbar: yes
+  credentials_navbar: yes
+  display_options: 30|0|5|10|20|40|50|100|500
+  inventory_navbar: yes
+  iprange_navbar: yes
+  languages: en|fr
+  mibsupport_disabled: no
+  mibsupport_navbar: yes
+  networktask_save: ''
+  remotes_admin: no
+  remotes_navbar: yes
+  remotes_show_expiration: no
+  remotes_show_password: no
+  results_navbar: yes
+  scheduling_navbar: yes
+  session_timeout: '86400'
+  updating_support: yes
+  yaml_navbar: yes

@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:17
+    container_name: readeck-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-readeck}
+      POSTGRES_USER: ${POSTGRES_USER:-readeck}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-readeckisawesome}
+    volumes:
+      - ./readeck/db:/var/lib/postgresql/data
+    restart: ${RESTART_POLICY:-unless-stopped}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-readeck}", "-d", "${POSTGRES_DB:-readeck}"]
+      interval: 5s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+  app:
+    image: codeberg.org/readeck/readeck:latest
+    container_name: readeck
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    ports:
+      - ${READECK_PORT:-8000}:8000
+    environment:
+      # The URL of the instance's database.
+      READECK_DATABASE_SOURCE: "postgres://${POSTGRES_USER:-readeck}:${POSTGRES_PASSWORD:-readeckisawesome}@readeck-db:5432/${POSTGRES_DB:-readeck}"
+      # Defines the application log level. Can be error, warn, info, debug.
+      READECK_LOG_LEVEL: info
+      # The IP address on which Readeck listens.
+      READECK_SERVER_HOST: "0.0.0.0"
+      # The TCP port on which Readeck listens. Update container port above to match (right of colon).
+      READECK_SERVER_PORT: 8000
+      # Easier to read log format
+      READECK_LOG_FORMAT: text
+      # Optional, the URL prefix of Readeck.
+      # READECK_SERVER_PREFIX: "/"
+    volumes:
+      - ./readeck/data:/readeck
+    restart: ${RESTART_POLICY:-unless-stopped}
+    healthcheck:
+      test: ["CMD", "/bin/readeck", "healthcheck", "-config", "config.toml"]
+      interval: 30s
+      timeout: 2s
+      retries: 3

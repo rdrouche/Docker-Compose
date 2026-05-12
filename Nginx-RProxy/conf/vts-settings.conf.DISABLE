@@ -1,0 +1,6 @@
+vhost_traffic_status_zone shared:ngx_http_vhost_traffic_status:128m;
+
+# By Country
+#vhost_traffic_status_filter_by_set_key $geoip2_data_country_iso_code country::*;
+# By types (Humans or Bots)
+#vhost_traffic_status_filter_by_set_key $is_bot bots::*;

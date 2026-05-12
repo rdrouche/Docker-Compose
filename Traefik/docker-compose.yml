@@ -1,0 +1,41 @@
+# Before starting the container, create the proxy network on the Docker host server using the command: `docker network create proxy`
+
+services:
+  traefik:
+    image: traefik:${TRAEFIK_TAG:-v3.6}
+    restart: always
+    networks:
+      - proxy
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--providers.file.filename=/dynamic/tls.yaml"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.docker.network=proxy"
+      # Logging config
+      - "--log.level=DEBUG"
+      - "--accesslog=false"
+      - "--accesslog.filePath=/logs/access.log"
+      # HTTP Config
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      # HTTPS Config
+      - "--entryPoints.websecure.http.tls=true"
+      - "--entryPoints.web.forwardedHeaders.insecure=true"
+      # Behavior
+      - "--entryPoints.websecure.forwardedHeaders.insecure=true" # Allows the transfer of HTTP headers from a proxy server in front
+      - "--serversTransport.insecureSkipVerify=true" # Allows you to bypass verification of the target's SSL certificate (proxy_ssl_verify off)
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      # Add the following volumes
+      - "./certs:/certs:ro"
+      - "./dynamic:/dynamic:ro"
+
+networks:
+  proxy:
+    external: true

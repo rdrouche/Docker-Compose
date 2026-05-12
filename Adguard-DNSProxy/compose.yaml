@@ -1,0 +1,9 @@
+services:
+  dnsproxy:
+    image: adguard/dnsproxy
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+    volumes:
+      - ./config.yaml:/opt/dnsproxy/config.yaml
+    

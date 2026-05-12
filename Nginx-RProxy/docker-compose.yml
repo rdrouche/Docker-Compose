@@ -1,0 +1,75 @@
+services:
+  nginx:
+    image: rdrit/nginx-rproxy:${NGINX_TAG:-1.29.8}
+    restart: ${NGINX_RESTART_POLICY:-always}
+    networks:
+      - nginx-net
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - NGINX_WORKER_PROCESSES="${NGINX_WORKER_PROCESSES:-auto}"
+      - NGINX_WORKER_CONNECTIONS="${NGINX_WORKER_CONNECTIONS:-768}"
+    volumes:
+      - ./cache:/var/cache/nginx
+      - ./conf:/etc/nginx/conf.d
+      - ./sites:/etc/nginx/sites
+      - ./streams:/etc/nginx/streams
+      - ./snippets:/etc/nginx/snippets
+      - ./modules:/etc/nginx/modules
+      - ./logs:/var/log/nginx
+      - ./ssl:/ssl
+      # Certbot folder
+      - ./certs:/etc/letsencrypt
+      # Geoip database      
+      - ./geoip_data:/geoip
+
+  error-pages:
+    image: tarampampam/error-pages:${ERROR_PAGES_TAG:-latest}
+    restart: ${ERROR_PAGES_RESTART_POLICY:-always}
+    networks:
+      - nginx-net
+    environment:
+      - TEMPLATE_NAME=${ERROR_PAGES_TEMPLATE:-connection} 
+    #ports:
+    #  - "8080:8080"
+
+  geoipupdate:
+    image: maxmindinc/geoipupdate:${GEOIPUPDATE_TAG:-latest}
+    container_name: maxmind_updater
+    profiles: ["geo", "all"]
+    networks:
+      - nginx-net
+    environment:
+      - GEOIPUPDATE_ACCOUNT_ID=${GEOIPUPDATE_ACCOUNT_ID}
+      - GEOIPUPDATE_LICENSE_KEY=${GEOIPUPDATE_LICENSE_KEY}
+      - GEOIPUPDATE_EDITION_IDS=${GEOIPUPDATE_EDITION_IDS}
+      - GEOIPUPDATE_FREQUENCY=${GEOIPUPDATE_FREQUENCY:-168}
+    volumes:
+      - ./geoip_data:/usr/share/GeoIP
+    restart: ${GEOIPUPDATE_RESTART_POLICY:-always}
+
+  certbot:
+    image: certbot/dns-cloudflare:${CERTBOT_TAG:-latest}
+    container_name: certbot
+    profiles: ["ssl", "all"]
+    restart: ${CERTBOT_RESTART_POLICY:-always}
+    volumes:
+      - ./certs:/etc/letsencrypt
+      - ./logs:/var/log/letsencrypt
+      - ./cloudflare:/dns
+    entrypoint: /bin/sh
+    command:
+      - "-c"
+      - |
+        certbot certonly --dns-cloudflare --dns-cloudflare-credentials /dns/credentials.ini --dns-cloudflare-propagation-seconds 30 --non-interactive --agree-tos --email ${CERTBOT_EMAIL} -d domain-a.tld -d '*.domain-a.tld'
+
+        certbot certonly --dns-cloudflare --dns-cloudflare-credentials /dns/credentials.ini --dns-cloudflare-propagation-seconds 30 --non-interactive --agree-tos --email ${CERTBOT_EMAIL} -d domain-b.tld -d '*.domain-b.tld'
+
+        while true; do 
+          certbot renew --quiet; 
+          sleep 12h; 
+        done
+
+networks:
+  nginx-net:

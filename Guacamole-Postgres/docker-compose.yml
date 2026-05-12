@@ -1,0 +1,44 @@
+services:
+  guacamole-db:
+    image: postgres:18-alpine
+    restart: ${RESTART_POLICY:-unless-stopped}
+    environment:
+      - POSTGRES_DB=${POSTGRESQL_DATABASE}
+      - POSTGRES_USER=${POSTGRESQL_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRESQL_PASSWORD}
+    networks:
+      - guacamole-net 
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql
+      - ./init:/docker-entrypoint-initdb.d
+
+  guacamole-guacd:
+    image: guacamole/guacd:${GUACD_VERSION:-latest}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    user: root
+    env_file:
+      - .env
+    networks:
+      - guacamole-net
+    volumes:
+      - ./data/guacd/drive:/drive:rw 
+      - ./data/guacd/record:/record:rw  
+    
+  guacamole-web:
+    image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    user: root
+    env_file:
+      - .env
+    networks:
+      - guacamole-net
+    ports:
+      - ${GUACAMOLE_PORT:-8080}:8080
+    depends_on:
+      - guacamole-db
+      - guacamole-guacd
+    volumes:
+      - ./data/guacd/record:/record:rw
+
+networks:
+  guacamole-net:

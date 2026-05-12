@@ -1,0 +1,7 @@
+FROM collabora/code:25.04.9.4.1
+
+USER root
+COPY ca-internal.pem /usr/local/share/ca-certificates/ca-internal.crt
+RUN update-ca-certificates
+
+USER cool

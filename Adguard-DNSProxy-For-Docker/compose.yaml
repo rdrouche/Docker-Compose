@@ -1,0 +1,12 @@
+services:
+  dnsproxy:
+    image: adguard/dnsproxy
+    networks:
+      dnsproxy-net:
+    volumes:
+      - ./config.yaml:/opt/dnsproxy/config.yaml
+
+networks:
+  dnsproxy-net:
+    external: true
+    

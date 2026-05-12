@@ -1,0 +1,36 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:${UKUMA_VERSION:-2.2.1}
+    networks:
+      - uk-network
+    volumes:
+      - ./data-kuma:/app/data
+    ports:
+      - '${UKUMA_PORT_EXPOSE:-3001}:3001'
+    restart: unless-stopped
+    env_file:
+      - uk.env
+    depends_on:
+      - mariadb
+    logging:
+      driver: ${UK_LOGGIN_DRIVER:-none}
+    
+  mariadb:
+    image: ${DB_ENGINE:-mariadb}:${DB_VERSION:-11}
+    command: ["--max_allowed_packet=512M"]
+    restart: unless-stopped
+    networks:
+      - uk-network
+    volumes:
+      - ./data-mariadb:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-ChangeMeRootPassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-ukuma}
+      MYSQL_USER: ${MYSQL_USER:-ukuma}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-changeme}
+    #ports:
+    #  - '${MYSQL_PORT_EXPOSE}:3306'
+
+networks:
+  uk-network:
+    driver: bridge

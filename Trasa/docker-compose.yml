@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:13.0
+    container_name: db
+    restart: always
+    environment:
+      - POSTGRES_USER=trasauser
+      - POSTGRES_PASSWORD=trasauser
+      - POSTGRES_DB=trasadb
+    volumes:
+      - ./trasa_data/postgre:/var/lib/postgresql/data
+    networks:
+      - trasa
+
+  redis:
+    image: redis:6.0.8
+    container_name: redis
+    restart: always
+    networks:
+      - trasa
+
+  guacd:
+    image: seknox/guacd:v0.0.1
+    container_name: guacd
+    user: root
+    restart: always
+    volumes:
+      - /tmp/trasa/accessproxy/guac:/tmp/trasa/accessproxy/guac
+    networks:
+      - trasa
+
+  trasa_app:
+    image: seknox/trasa:v1.1.4
+    container_name: trasa_app
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+      - 8022:8022
+    environment:
+      - TRASA.LISTENADDR=IP_SERVER
+      - TRASA.AUTOCERT=false
+      - DATABASE.SERVER=db
+      - REDIS.SERVER=redis:6379
+      - PROXY.GUACDADDR=guacd:4822
+    volumes:
+      - /tmp/trasa/accessproxy/guac:/tmp/trasa/accessproxy/guac
+    links:
+      - db:db
+      - redis:redis
+      - guacd:guacd
+    networks:
+      - trasa
+  
+networks:
+  trasa:
+    driver: bridge
+    name: trasa
