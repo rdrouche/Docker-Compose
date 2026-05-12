@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+    rundeck:
+        image: rundeck/rundeck:${RUNDECK_VERSION}
+        restart: always
+        links:
+          - mysql
+        environment:
+            RUNDECK_DATABASE_DRIVER: org.mariadb.jdbc.Driver
+            RUNDECK_DATABASE_USERNAME: ${MYSQL_USER}
+            RUNDECK_DATABASE_PASSWORD: ${MYSQL_PASSWORD}
+            RUNDECK_DATABASE_URL: jdbc:mysql://mysql/${MYSQL_DATABASE}?autoReconnect=true&useSSL=false
+            RUNDECK_GRAILS_URL: ${RUNDECK_GRAILS_URL}
+        volumes:
+          - ./data/rundeck:/home/rundeck/server/data/
+          - ./data/rundeck-jobs-logs:/home/rundeck/var/logs/rundeck/
+          - ./config/realm.properties:/home/rundeck/server/config/realm.properties
+        ports:
+          - 4440:4440
+    mysql:
+        image: mariadb:10.11
+        restart: always
+        expose:
+          - 3306
+        environment:
+          - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+          - MYSQL_DATABASE=${MYSQL_DATABASE}
+          - MYSQL_USER=${MYSQL_USER}
+          - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        volumes:
+          - ./data/mariadb:/var/lib/mysql
