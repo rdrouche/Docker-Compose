@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    restart: always
+    environment:
+      COLLECTIONS: "crowdsecurity/nginx crowdsecurity/sshd"
+      GID: "${GID-1000}"
+    volumes:
+      - /var/log:/var/log
+      - crowdsec-db:/var/lib/crowdsec/data/
+      - crowdsec-config:/etc/crowdsec/
+    networks:
+      crowdsec_network:
+        ipv4_address: 10.199.0.5
+
+volumes:
+  crowdsec-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "/containers/crowdsec/vol-crowdsec-config"
+
+  crowdsec-db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "/containers/crowdsec/vol-crowdsec-db"
+
+networks:
+  crowdsec_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.199.0.0/24
