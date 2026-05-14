@@ -1,6 +1,10 @@
-# Nginx Reverse Proxy - Debian 13 (Docker)
+[![Docker Pulls](https://img.shields.io/docker/pulls/rdrit/nginx-rproxy?logo=docker&label=Docker%20Hub)](https://hub.docker.com/r/rdrit/nginx-rproxy) [![Docker Image Version](https://img.shields.io/docker/v/rdrit/nginx-rproxy/latest?logo=docker&label=version)](https://hub.docker.com/r/rdrit/nginx-rproxy) [![Docker Image Size](https://img.shields.io/docker/image-size/rdrit/nginx-rproxy/latest?logo=docker&label=image%20size)](https://hub.docker.com/r/rdrit/nginx-rproxy) [![Dockerfile](https://img.shields.io/badge/Dockerfile-View-blue?logo=docker)](https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy)
+
+# Nginx Reverse Proxy 
 
 Ce dépôt contient une solution complète de Reverse Proxy Nginx optimisée, incluant la gestion automatique des certificats SSL (Cloudflare), la géolocalisation IP, et le filtrage avancé des bots.
+
+Le dépot de construction de l'image : https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy
 
 ## 🚀 Fonctionnalités
 
@@ -10,6 +14,7 @@ Ce dépôt contient une solution complète de Reverse Proxy Nginx optimisée, in
 - Sécurité des Bots : Listes blanches (Good Bots) et listes noires (Bad Bots, IA/Scrapers).
 - Gestion d'Erreurs : Pages d'erreurs personnalisées et esthétiques qui utilise **[error-pages](https://github.com/tarampampam/error-pages)**.
 - Cloudflare Ready : Restauration des IPs réelles des visiteurs derrière le proxy Cloudflare.
+- Module Nginx VTS inclus - [nginx-module-vts](https://github.com/vozlt/nginx-module-vts)
 
 ## 📁 Structure du Projet
 
@@ -18,7 +23,6 @@ Ce dépôt contient une solution complète de Reverse Proxy Nginx optimisée, in
 - sites/ : Vos fichiers de configuration VirtualHost.
 - certs/ : Certificats SSL générés par Certbot.
 - geoip_data/ : Bases de données MaxMind (mises à jour automatiquement).
-- modules/ : Permet l'ajout du module supplémentaire comme [nginx-module-vts](https://github.com/vozlt/nginx-module-vts)
 
 > Afin que les fichiers de configuration soit chargés par Nginx, ils doivent avoir l'extension `.conf`
 
@@ -42,7 +46,7 @@ cd /containers/nginx-rproxy
 Cloner le dossier : 
 
 ```
-bash <(wget -qO- https://git.rdr-it.com/root/scripts/-/raw/master/Linux/rdr-it/get-docker-compse/get.sh) Nginx-RProxy
+bash <(wget -qO- https://forge.rdr-it.com/romain/Docker-Compose/raw/branch/main/get.sh) Nginx-RProxy
 ```
 
 ### 3. Configuration de l'environnement
@@ -168,6 +172,11 @@ Il est possible de modifier les fichiers de configuration et virtualhost sans av
 - Recharger la configuration : `docker compose exec nginx nginx -s reload`
 
 ## Chanlog
+
+### 14/05/2026
+
+- Passage version 1.30.x
+- Registre par défaut pour l'image : https://forge.rdr-it.com/Dockerfiles/-/packages/container/nginx-reverse-proxy/
 
 ### 06/05/2026
 
