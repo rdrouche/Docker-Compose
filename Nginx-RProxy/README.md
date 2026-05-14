@@ -1,4 +1,4 @@
-[![Docker Pulls](https://img.shields.io/docker/pulls/rdrit/nginx-rproxy?logo=docker&label=Docker%20Hub)](https://hub.docker.com/r/rdrit/nginx-rproxy) [![Docker Image Version](https://img.shields.io/docker/v/rdrit/nginx-rproxy/latest?logo=docker&label=version)](https://hub.docker.com/r/rdrit/nginx-rproxy) ![Static Badge](https://img.shields.io/badge/Version-1.30.1-blue?logo=nginx&logoColor=green&logoSize=auto&link=https%3A%2F%2Fforge.rdr-it.com%2FDockerfiles%2F-%2Fpackages%2Fcontainer%2Fnginx-reverse-proxy%2F)
+[![Docker Pulls](https://img.shields.io/docker/pulls/rdrit/nginx-rproxy?logo=docker&label=Docker%20Hub)](https://hub.docker.com/r/rdrit/nginx-rproxy)  ![Static Badge](https://img.shields.io/badge/Version-1.30.1-blue?logo=nginx&logoColor=green&logoSize=auto&link=https%3A%2F%2Fforge.rdr-it.com%2FDockerfiles%2F-%2Fpackages%2Fcontainer%2Fnginx-reverse-proxy%2F)
   [![Dockerfile](https://img.shields.io/badge/Dockerfile-View-blue?logo=docker)](https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy)
 
 # Nginx Reverse Proxy 
