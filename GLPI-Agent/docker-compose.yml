@@ -1,7 +1,7 @@
 services:
   glpi-agent:
     container_name: docker-glpi-agent
-    image: rdrit/glpi-agent:1.15
+    image: forge.rdr-it.com/dockerfiles/glpi-agent:1.17
     ports:
       - 62354:62354
     volumes:

@@ -1,10 +1,15 @@
-[![Docker Pulls](https://img.shields.io/docker/pulls/rdrit/glpi-agent?logo=docker&label=Docker%20Hub)](https://hub.docker.com/r/rdrit/glpi-agent) [![Docker Image Version](https://img.shields.io/docker/v/rdrit/glpi-agent/latest?logo=docker&label=version)](https://hub.docker.com/r/rdrit/glpi-agent) [![Docker Image Size](https://img.shields.io/docker/image-size/rdrit/glpi-agent/latest?logo=docker&label=image%20size)](https://hub.docker.com/r/rdrit/glpi-agent) [![Dockerfile](https://img.shields.io/badge/Dockerfile-View-blue?logo=docker)](https://git.rdr-it.com/dockerfile/glpi-agent)
+[![Docker Pulls](https://img.shields.io/docker/pulls/rdrit/glpi-agent?logo=docker&label=Docker%20Hub)](https://hub.docker.com/r/rdrit/glpi-agent) [![Docker Image Version](https://img.shields.io/docker/v/rdrit/glpi-agent/latest?logo=docker&label=version)](https://hub.docker.com/r/rdrit/glpi-agent) [![Docker Image Size](https://img.shields.io/docker/image-size/rdrit/glpi-agent/latest?logo=docker&label=image%20size)](https://hub.docker.com/r/rdrit/glpi-agent) [![Dockerfile](https://img.shields.io/badge/Dockerfile-View-blue?logo=docker)](https://forge.rdr-it.com/Dockerfiles/GLPI-Agent)
 
 # GLPI Agent Docker - RDR-IT 🚀
 
 Un conteneur Docker pour déployer facilement l’**agent GLPI** et centraliser l’inventaire réseau de votre infrastructure.
 
 Ce projet inclut une configuration prête à l’emploi et un support pour le plugin **Toolbox**, avec possibilité d’activer une authentification basique pour l’accès web.
+
+Images conteneur disponiblr sur : 
+
+- https://forge.rdr-it.com/Dockerfiles/-/packages/container/glpi-agent/
+- https://hub.docker.com/r/rdrit/glpi-agent
 
 ---
 
