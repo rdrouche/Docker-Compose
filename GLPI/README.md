@@ -1,4 +1,4 @@
-[![Docker Pulls](https://img.shields.io/docker/pulls/rdrit/glpi?logo=docker&label=Docker%20Hub)](https://hub.docker.com/r/rdrit/glpi) [![Docker Image Version](https://img.shields.io/docker/v/rdrit/glpi/latest?logo=docker&label=version)](https://hub.docker.com/r/rdrit/glpi) [![Docker Image Size](https://img.shields.io/docker/image-size/rdrit/glpi/latest?logo=docker&label=image%20size)](https://hub.docker.com/r/rdrit/glpi) [![Dockerfile](https://img.shields.io/badge/Dockerfile-View-blue?logo=docker)](https://git.rdr-it.com/dockerfile/glpi)
+[![Docker Pulls](https://img.shields.io/docker/pulls/rdrit/glpi?logo=docker&label=Docker%20Hub)](https://hub.docker.com/r/rdrit/glpi) [![Docker Image Version](https://img.shields.io/docker/v/rdrit/glpi/latest?logo=docker&label=version)](https://hub.docker.com/r/rdrit/glpi) [![Docker Image Size](https://img.shields.io/docker/image-size/rdrit/glpi/latest?logo=docker&label=image%20size)](https://hub.docker.com/r/rdrit/glpi) [![Dockerfile](https://img.shields.io/badge/Dockerfile-View-blue?logo=docker)](https://forge.rdr-it.com/Dockerfiles/GLPI)
 
 ## 📦 Déploiement de GLPI avec Docker Compose
 
@@ -12,7 +12,12 @@ Ce dépôt fournit une stack entièrement opérationnelle pour déployer GLPI vi
 * ⏱️ Cron GLPI (exécution automatique)
 
 
-[docker-compose.yml](https://git.rdr-it.com/root/docker-compose/-/tree/main/GLPI)
+- forge.rdr-it.com [docker-compose.yml](https://forge.rdr-it.com/romain/Docker-Compose/src/branch/main/GLPI)
+- Github [docker-compose.yml](https://github.com/rdrouche/Docker-Compose/tree/main/GLPI)
+
+## Tutoriels
+
+- [FR : GLPI 11 en Docker : installation simple avec mon image personnalisée](https://rdr-it.com/glpi-11-en-docker-installation-simple-avec-mon-image-personnalisee/)
 
 ## ⚙️ Prérequis
 
@@ -53,7 +58,7 @@ Le fichier .env permet de personnaliser toute la stack :
 ```console
 mkdir -p /containers/glpi
 cd /contaienrs/glpi
-bash <(wget -qO- https://git.rdr-it.com/root/scripts/-/raw/master/Linux/rdr-it/get-docker-compse/get.sh) GLPI
+bash <(wget -qO- https://forge.rdr-it.com/romain/Docker-Compose/raw/branch/main/get.sh) GLPI
 ```
 2️⃣ Modifier le fichier .env avec vos valeurs.
 
