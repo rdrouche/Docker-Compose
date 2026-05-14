@@ -59,7 +59,7 @@ Images conteneur disponiblr sur :
 services:
   glpi-agent:
     container_name: docker-glpi-agent
-    image: rdrit/glpi-agent:1.15
+    image: forge.rdr-it.com/dockerfiles/glpi-agent
     ports:
       - 62354:62354
     volumes:
@@ -78,7 +78,7 @@ docker run -d \
   -p 62354:62354 \
   -e GLPI_SERVER=https://glpi.domain.tld \
   -e GLPI_SERVER_NO_SSL_CHECK=true \
-  glpiagent
+  forge.rdr-it.com/dockerfiles/glpi-agent
 ```
 
 ## 📦 Depuis le dépôt Git
