@@ -1,0 +1,40 @@
+---
+name: codelaunch
+
+services:
+  backend:
+    image: docker pull forge.rdr-it.com/romain/docker-compose/code-launch:1.2.2-1
+    container_name: codelaunch-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - DATA_DIR=/data
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./codelaunch-data:/data
+      - ${CODE_SERVER_DATA_PATH:-/code-server-data}:${CODE_SERVER_DATA_PATH:-/code-server-data}
+      - ${CODE_SERVER_PASSWD_PATH:-/var/lib/code-server}:${CODE_SERVER_PASSWD_PATH:-/var/lib/code-server}
+    networks:
+      - proxy
+      - codelaunch-internal
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "proxy"
+      traefik.http.routers.codelaunch.rule: "Host(`${BASE_UI_DOMAIN:-launch.example.com}`)"
+      traefik.http.routers.codelaunch.tls: "true"
+      traefik.http.routers.codelaunch.entrypoints: "websecure"
+      traefik.http.routers.codelaunch.service: "codelaunch"
+      traefik.http.services.codelaunch.loadbalancer.server.port: "3000"
+
+#volumes:
+#  codelaunch-data:
+#    name: codelaunch-data
+
+networks:
+  proxy:
+    external: true
+    name: ${DOCKER_NETWORK:-proxy}
+  codelaunch-internal:
+    name: codelaunch-internal
