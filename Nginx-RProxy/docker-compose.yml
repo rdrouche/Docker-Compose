@@ -79,7 +79,6 @@ services:
       - CROWDSEC_LOCAL_ONLY=${CROWDSEC_LOCAL_ONLY:-false}
       # GoAccess (optionnel)
       - GOACCESS_IMAGE=${GOACCESS_IMAGE:-allinurl/goaccess:latest}
-      - GOACCESS_REFRESH=${GOACCESS_REFRESH:-30}
       - GOACCESS_LOG_FORMAT=${GOACCESS_LOG_FORMAT:-COMBINED}
       - DIR_GOACCESS=/nginx/goaccess
       # Chemins HOTE pour les bind mounts crees via Docker socket
