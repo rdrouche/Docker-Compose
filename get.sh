@@ -58,7 +58,9 @@ fi
 
 if [ "$MOVE_FILES" = true ]; then
   echo "📂 Déplacement du contenu dans le dossier courant (${START_DIR})..."
+  shopt -s dotglob
   sudo mv "$TARGET_DIR"/* "$START_DIR"/
+  shopt -u dotglob
   echo "🧹 Nettoyage..."
   cd "$START_DIR"
   sudo rm -rf "$TMP_DIR"
