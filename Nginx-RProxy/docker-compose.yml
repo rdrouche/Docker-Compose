@@ -26,6 +26,95 @@ services:
       # Geoip database      
       - ./geoip_data:/geoip
 
+  # ──────────────────────────────────────────────────────────────
+  # Nginx Dashboard — https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy-dashboard
+  # ──────────────────────────────────────────────────────────────
+  nginx-dashboard:
+    image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy-dashboard:${NGX_DHB_TAG:-9.0.6-1}
+    container_name: nginx-dashboard
+    restart: ${NGINX_RESTART_POLICY:-always}
+    networks:
+      - nginx-net
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      # Endpoint VTS interne (conteneur nginx)
+      - NGINX_VTS_URL=http://nginx:8080/status.json
+      # Nom du conteneur nginx pour docker exec (nginx -t / nginx -s reload)
+      - NGINX_CONTAINER=nginx
+      # Sécurité API
+      - API_TOKEN=${NGINX_DASHBOARD_API_TOKEN:-changeme-set-in-env}
+      - WEBHOOK_SECRET=${NGINX_DASHBOARD_WEBHOOK_SECRET:-changeme-set-in-env}
+      # Répertoires de configuration montés (doivent correspondre aux volumes ci-dessous)
+      - DIR_SITES=/nginx/sites
+      - DIR_CONF=/nginx/conf
+      - DIR_SNIPPETS=/nginx/snippets
+      - DIR_STREAMS=/nginx/streams
+      - DIR_SSL=/nginx/ssl
+      - DIR_CERTS=/nginx/certs
+      - DIR_LOGS=/nginx/logs
+      # Auth
+      - USERS_FILE=/config/users.yml
+      - SESSION_SECRET=${NGINX_DASHBOARD_SESSION_SECRET:-changeme-generate-with-openssl-rand-hex-32}
+      - SESSION_TTL_HOURS=${NGINX_DASHBOARD_SESSION_TTL_HOURS:-8}
+      # Docker socket pour API exec
+      - DOCKER_SOCKET=/var/run/docker.sock
+      - NGINX_CONTAINER=nginx
+      # Git sync — toutes ces vars doivent etre dans .env SANS guillemets
+      - GIT_REPO_URL=${GIT_REPO_URL:-}
+      - GIT_BRANCH=${GIT_BRANCH:-main}
+      - GIT_BACKUP_BRANCH=${GIT_BACKUP_BRANCH:-backup}
+      - GIT_TOKEN=${GIT_TOKEN:-}
+      - GIT_SSH_KEY=${GIT_SSH_KEY:-}
+      # Image nginx pour les tests ephemeres
+      - NGINX_IMAGE=${NGINX_IMAGE:-}
+      # Backups
+      - BACKUP_KEEP=${BACKUP_KEEP:-20}
+      # CrowdSec (optionnel)
+      - CROWDSEC_URL=${CROWDSEC_URL:-}
+      - CROWDSEC_API_KEY=${CROWDSEC_API_KEY:-}
+      # CrowdSec Prometheus (recommande — local uniquement, metriques moteur)
+      - CROWDSEC_PROMETHEUS_URL=${CROWDSEC_PROMETHEUS_URL:-}
+      - CROWDSEC_LOCAL_ONLY=${CROWDSEC_LOCAL_ONLY:-false}
+      # GoAccess (optionnel)
+      - GOACCESS_IMAGE=${GOACCESS_IMAGE:-allinurl/goaccess:latest}
+      - GOACCESS_REFRESH=${GOACCESS_REFRESH:-30}
+      - GOACCESS_LOG_FORMAT=${GOACCESS_LOG_FORMAT:-COMBINED}
+      - DIR_GOACCESS=/nginx/goaccess
+      # Chemins HOTE pour les bind mounts crees via Docker socket
+      # Obligatoire : chemin absolu sur l hote (pas dans le conteneur dashboard)
+      - HOST_LOGS=${HOST_LOGS:-./logs}
+      - HOST_GOACCESS=${HOST_GOACCESS:-./goaccess}
+      # Nom du reseau Docker partage (pour DNS entre conteneurs)
+      - NGINX_NETWORK=${COMPOSE_PROJECT_NAME:-nginx-rproxy}_nginx-net
+    volumes:
+      # Docker socket pour executer nginx -t / nginx -s reload
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Configs nginx (lecture seule — le dashboard ne modifie pas les fichiers)
+      - ./sites:/nginx/sites:ro
+      - ./conf:/nginx/conf:ro
+      - ./snippets:/nginx/snippets:ro
+      - ./streams:/nginx/streams:ro
+      # Certificats SSL (lecture seule)
+      - ./ssl:/nginx/ssl:ro
+      - ./certs:/nginx/certs:ro
+      # Logs nginx (lecture seule pour stream en direct)
+      - ./logs:/nginx/logs:ro
+      # GoAccess data (db + rapports generes)
+      - ./goaccess:/nginx/goaccess
+      # Git workdir (clone du repo dans le conteneur)
+      - git-work:/git-work
+      # Backups ZIP locaux
+      - ./backups:/nginx/backups
+      # Clé SSH Git (si auth SSH)
+      # - ./nginx-dashboard/config/id_rsa:/config/id_rsa:ro
+      # Fichier des utilisateurs (lecture/écriture pour auto-hash des mots de passe)
+      - ./nginx-dashboard/config:/config
+    depends_on:
+      - nginx
+    
+
   error-pages:
     image: tarampampam/error-pages:${ERROR_PAGES_TAG:-latest}
     restart: ${ERROR_PAGES_RESTART_POLICY:-always}
