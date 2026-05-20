@@ -32,6 +32,7 @@ services:
   nginx-dashboard:
     image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy-dashboard:${NGX_DHB_TAG:-9.0.6-1}
     container_name: nginx-dashboard
+    profiles: ["dash", "all"]
     restart: ${NGINX_RESTART_POLICY:-always}
     networks:
       - nginx-net
