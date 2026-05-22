@@ -1,6 +1,7 @@
 # name: allow-visit-001
 # description: Autorise seulement les visites depuis des IPs en France / Grande Bretagne et Irlance, IP Privee et les Good bots pour indexation
 # require: geoip2-load-database,good-bots,private-ips
+# usage: ajouter le snippet allow-visit-002.conf dans le virtualhost
 # version: 1.0.0
 
 # Autorise seulement les visites depuis des IPs en France / Grande Bretagne et Irlance, IP Privee et les Good bots pour indexation
