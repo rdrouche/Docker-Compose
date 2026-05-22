@@ -1,3 +1,4 @@
+# version: 20260522-01
 services:
   nginx:
     image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy:${NGINX_TAG:-1.30.1}
@@ -41,12 +42,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # Sécurité API
+      # Secret
       - API_TOKEN=${NGINX_DASHBOARD_API_TOKEN:-changeme-set-in-env}
       - WEBHOOK_SECRET=${NGINX_DASHBOARD_WEBHOOK_SECRET:-changeme-set-in-env}
-      # Auth
       - SESSION_SECRET=${NGINX_DASHBOARD_SESSION_SECRET:-changeme-generate-with-openssl-rand-hex-32}
-      - SESSION_TTL_HOURS=${NGINX_DASHBOARD_SESSION_TTL_HOURS:-8}
       # Git sync — toutes ces vars doivent etre dans .env SANS guillemets
       - GIT_REPO_URL=${GIT_REPO_URL:-}
       - GIT_BRANCH=${GIT_BRANCH:-main}
@@ -55,17 +54,12 @@ services:
       - GIT_SSH_KEY=${GIT_SSH_KEY:-}
       # Image nginx pour les tests ephemeres
       - NGINX_IMAGE=${NGINX_IMAGE:-}
-      # Backups
-      - BACKUP_KEEP=${BACKUP_KEEP:-20}
       # CrowdSec (optionnel)
       - CROWDSEC_URL=${CROWDSEC_URL:-}
       - CROWDSEC_API_KEY=${CROWDSEC_API_KEY:-}
       # CrowdSec Prometheus (recommande — local uniquement, metriques moteur)
       - CROWDSEC_PROMETHEUS_URL=${CROWDSEC_PROMETHEUS_URL:-}
       - CROWDSEC_LOCAL_ONLY=${CROWDSEC_LOCAL_ONLY:-false}
-      # GoAccess (optionnel)
-      - GOACCESS_IMAGE=${GOACCESS_IMAGE:-allinurl/goaccess:latest}
-      - GOACCESS_LOG_FORMAT=${GOACCESS_LOG_FORMAT:-COMBINED}
       # Nom du reseau Docker partage (pour DNS entre conteneurs)
       - NGINX_NETWORK=${COMPOSE_PROJECT_NAME:-nginx-rproxy}_nginx-net
     volumes:
