@@ -66,20 +66,16 @@ services:
       # GoAccess (optionnel)
       - GOACCESS_IMAGE=${GOACCESS_IMAGE:-allinurl/goaccess:latest}
       - GOACCESS_LOG_FORMAT=${GOACCESS_LOG_FORMAT:-COMBINED}
-      # Chemins HOTE pour les bind mounts crees via Docker socket
-      # Obligatoire : chemin absolu sur l hote (pas dans le conteneur dashboard)
-      - HOST_LOGS=${HOST_LOGS:-./logs}
-      - HOST_GOACCESS=${HOST_GOACCESS:-./goaccess}
       # Nom du reseau Docker partage (pour DNS entre conteneurs)
       - NGINX_NETWORK=${COMPOSE_PROJECT_NAME:-nginx-rproxy}_nginx-net
     volumes:
       # Docker socket pour executer nginx -t / nginx -s reload
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # Configs nginx (lecture seule — le dashboard ne modifie pas les fichiers)
-      - ./sites:/nginx/sites:ro
-      - ./conf:/nginx/conf:ro
-      - ./snippets:/nginx/snippets:ro
-      - ./streams:/nginx/streams:ro
+      - ./sites:/nginx/sites
+      - ./conf:/nginx/conf
+      - ./snippets:/nginx/snippets
+      - ./streams:/nginx/streams
       # Certificats SSL (lecture seule)
       - ./ssl:/nginx/ssl:ro
       - ./certs:/nginx/certs:ro
@@ -95,6 +91,8 @@ services:
       # - ./nginx-dashboard/config/id_rsa:/config/id_rsa:ro
       # Fichier des utilisateurs (lecture/écriture pour auto-hash des mots de passe)
       - ./nginx-dashboard/config:/config
+      # Geoip
+      - ./geoip_data:/geoip:ro
     depends_on:
       - nginx
     
@@ -155,3 +153,6 @@ networks:
   # Before create network : docker network create nginx-proxy
   #nginx-proxy:
   #  external: true
+
+volumes:
+  git-work:
