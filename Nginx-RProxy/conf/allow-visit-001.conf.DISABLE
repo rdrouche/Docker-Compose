@@ -1,9 +1,15 @@
+# name: allow-visit-001
+# description: Autorise seulement les visites depuis des IPs en France et les Good bots pour indexation
+# require: geoip2-load-database,good-bots,private-ips
+# version: 1.0.0
+
 # Autorise seulement les visites depuis des IPs en France et les Good bots pour indexation
 #
 # Utilisation des virtualhost
 # if ($allow_visit_001 = 0) {
 #   return 403;
 # }
+
 map "$geoip2_data_country_iso_code:$is_good_bot:$is_private_ip" $allow_visit_001 {
     default 0;      # Bloque par defaut
     
