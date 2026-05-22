@@ -34,34 +34,19 @@ services:
     container_name: nginx-dashboard
     profiles: ["dash", "all"]
     restart: ${NGINX_RESTART_POLICY:-always}
+    env_file:
+      - nginx-dashboard.env
     networks:
       - nginx-net
     ports:
       - "3000:3000"
     environment:
-      - PORT=3000
-      # Endpoint VTS interne (conteneur nginx)
-      - NGINX_VTS_URL=http://nginx:8080/status.json
-      # Nom du conteneur nginx pour docker exec (nginx -t / nginx -s reload)
-      - NGINX_CONTAINER=nginx
       # Sécurité API
       - API_TOKEN=${NGINX_DASHBOARD_API_TOKEN:-changeme-set-in-env}
       - WEBHOOK_SECRET=${NGINX_DASHBOARD_WEBHOOK_SECRET:-changeme-set-in-env}
-      # Répertoires de configuration montés (doivent correspondre aux volumes ci-dessous)
-      - DIR_SITES=/nginx/sites
-      - DIR_CONF=/nginx/conf
-      - DIR_SNIPPETS=/nginx/snippets
-      - DIR_STREAMS=/nginx/streams
-      - DIR_SSL=/nginx/ssl
-      - DIR_CERTS=/nginx/certs
-      - DIR_LOGS=/nginx/logs
       # Auth
-      - USERS_FILE=/config/users.yml
       - SESSION_SECRET=${NGINX_DASHBOARD_SESSION_SECRET:-changeme-generate-with-openssl-rand-hex-32}
       - SESSION_TTL_HOURS=${NGINX_DASHBOARD_SESSION_TTL_HOURS:-8}
-      # Docker socket pour API exec
-      - DOCKER_SOCKET=/var/run/docker.sock
-      - NGINX_CONTAINER=nginx
       # Git sync — toutes ces vars doivent etre dans .env SANS guillemets
       - GIT_REPO_URL=${GIT_REPO_URL:-}
       - GIT_BRANCH=${GIT_BRANCH:-main}
@@ -81,7 +66,6 @@ services:
       # GoAccess (optionnel)
       - GOACCESS_IMAGE=${GOACCESS_IMAGE:-allinurl/goaccess:latest}
       - GOACCESS_LOG_FORMAT=${GOACCESS_LOG_FORMAT:-COMBINED}
-      - DIR_GOACCESS=/nginx/goaccess
       # Chemins HOTE pour les bind mounts crees via Docker socket
       # Obligatoire : chemin absolu sur l hote (pas dans le conteneur dashboard)
       - HOST_LOGS=${HOST_LOGS:-./logs}
