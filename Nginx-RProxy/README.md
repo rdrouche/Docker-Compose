@@ -1,3 +1,4 @@
+<!-- 20260523-01 -->
 [![Docker Pulls](https://img.shields.io/docker/pulls/rdrit/nginx-rproxy?logo=docker&label=Docker%20Hub)](https://hub.docker.com/r/rdrit/nginx-rproxy)  ![Static Badge](https://img.shields.io/badge/Version-1.30.1-blue?logo=nginx&logoColor=green&logoSize=auto&link=https%3A%2F%2Fforge.rdr-it.com%2FDockerfiles%2F-%2Fpackages%2Fcontainer%2Fnginx-reverse-proxy%2F)
   [![Dockerfile](https://img.shields.io/badge/Dockerfile-View-blue?logo=docker)](https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy)
 
@@ -16,6 +17,7 @@ Le dépot de construction de l'image : https://forge.rdr-it.com/Dockerfiles/ngin
 - Gestion d'Erreurs : Pages d'erreurs personnalisées et esthétiques qui utilise **[error-pages](https://github.com/tarampampam/error-pages)**.
 - Cloudflare Ready : Restauration des IPs réelles des visiteurs derrière le proxy Cloudflare.
 - Module Nginx VTS inclus - [nginx-module-vts](https://github.com/vozlt/nginx-module-vts)
+- Dashboard : visualisation stats, config (https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy-dashboard)
 
 ## 📁 Structure du Projet
 
@@ -61,6 +63,8 @@ nano .env
 
 - Modifiez `CERTBOT_EMAIL` pour les notifications SSL.
 - Renseignez vos identifiants `GEOIPUPDATE_ACCOUNT_ID` et `LICENSE_KEY`.
+
+Si nécessaire, créer un fichier `docker-compose.override.yml` et personnaliser les services, notamment la commande `certbot` et le réseau `nginx-proxy` dans le cas d'utilisation avec des conteneurs.
 
 ### 4. Configuration Cloudflare
 
