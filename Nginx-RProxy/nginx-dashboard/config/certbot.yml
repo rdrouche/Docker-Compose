@@ -1,0 +1,20 @@
+# version: 1.0.0
+# Certbot HTTP challenge — configuration
+# Dashboard manages the certbot container lifecycle
+
+enable: false
+
+# Email for Let's Encrypt notifications
+email: admin@example.com
+
+# Use Let's Encrypt staging server (no rate limits — for testing)
+staging: false
+
+# Certbot Docker image
+container_image: certbot/certbot:latest
+
+# Absolute path on the HOST for the webroot challenge directory
+# Must be bind-mounted into nginx at /var/www/letsencrypt (read)
+# and into certbot at /var/www/certbot (write)
+# Example: /containers/nginx-rproxy/webroot
+webroot_host_path: /containers/nginx-rproxy/webroot
