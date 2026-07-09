@@ -1,5 +1,9 @@
 # Changelog
 
+## 20260709
+
+- Passage sur GLPI 11.0.8 par défaut
+
 ## 20251211
 
 ### Added
