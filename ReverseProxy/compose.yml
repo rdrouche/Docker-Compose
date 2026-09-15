@@ -1,0 +1,109 @@
+services:
+  nginx:
+    image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy:${NGINX_TAG:-1.30.2}
+    restart: ${RESTART_POLICY:-always}
+    container_name: ${NGINX_CONTAINER_NAME:-nginx}
+    networks:
+      - nginx-net
+    ports:
+      - 80:80
+      - 443:433
+    environment:
+      - NGINX_WORKER_PROCESSES="${NGINX_WORKER_PROCESSES:-auto}"
+      - NGINX_WORKER_CONNECTIONS="${NGINX_WORKER_CONNECTIONS:-768}"
+    volumes:
+      - ./nginx/config:/etc/nginx
+      - ./nginx/webroot:/var/www
+      - ./nginx/logs:/var/log/nginx
+      - ./nginx/cache:/var/cache/nginx
+      - ./certificats/ssl:/ssl
+      - ./certificats/certbot:/etc/letsencrypt
+      - ./geoip_data:/geoip
+  
+  nginx-dashboard:
+    image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy-dashboard:${NGX_DHB_TAG:-12.1.16}
+    restart: ${RESTART_POLICY:-always}
+    container_name: ${NGX_DHB_CONTAINER_NAME:-nginx-dashboard}
+    networks:
+      - nginx-net
+    # Port config removed, use compose.override.yml for publish directly
+    env_file:
+      - nginx-dashboard.env
+    environment:
+      - API_TOKEN=${NGX_DHB_API_TOKEN:?changeme-set-in-env-generate-with-openssl-rand-hex-32}
+      - WEBHOOK_SECRET=${NGX_DHB_WEBHOOK_SECRET:?changeme-set-in-env-generate-with-openssl-rand-hex-32}
+      - SESSION_SECRET=${NGX_DHB_SESSION_SECRET:?cchangeme-set-in-env-generate-with-openssl-rand-hex-32}
+      - NGINX_NETWORK=${NGINX_NETWORK}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mapping Folders
+      - ./nginx/config/:/nginx
+      - ./nginx/cache:/var/cache/nginx
+      - ./nginx/logs:/nginx/logs:ro
+      - ./certificats:/certificats
+      # Third part config
+      - ./config/nginx-dashboard/config:/config
+      - ./geoip_data:/geoip
+      # GoAccess data (db + rapports generes)
+      - ./config/nginx-dashboard/goaccess:/nginx/goaccess
+      # Backups ZIP locaux
+      - ./backups:/nginx/backups
+      # Git workdir (clone the repo inside the container)
+      - git-work:/git-work
+    depends_on:
+      - nginx
+  
+  error-pages:
+    image: tarampampam/error-pages:${ERROR_PAGES_TAG:-latest}
+    restart: ${RESTART_POLICY:-always}
+    networks:
+      - nginx-net
+    environment:
+      - TEMPLATE_NAME=${ERROR_PAGES_TEMPLATE:-connection}
+
+  geoipupdate:
+    image: maxmindinc/geoipupdate:${GEOIPUPDATE_TAG:-latest}
+    restart: ${RESTART_POLICY:-always}
+    container_name: maxmind_updater
+    profiles: ["geo", "all"]
+    networks:
+      - nginx-net
+    environment:
+      - GEOIPUPDATE_ACCOUNT_ID=${GEOIPUPDATE_ACCOUNT_ID}
+      - GEOIPUPDATE_LICENSE_KEY=${GEOIPUPDATE_LICENSE_KEY}
+      - GEOIPUPDATE_EDITION_IDS=${GEOIPUPDATE_EDITION_IDS}
+      - GEOIPUPDATE_FREQUENCY=${GEOIPUPDATE_FREQUENCY:-168}
+    volumes:
+      - ./geoip_data:/usr/share/GeoIP
+
+  certbot:
+    image: certbot/dns-cloudflare:${CERTBOT_TAG:-latest}
+    container_name: certbot
+    profiles: ["ssl", "all"]
+    restart: ${RESTART_POLICY:-always}
+    volumes:
+      - ./certificats/certbot:/etc/letsencrypt
+      - ./nginx/logs:/var/log/letsencrypt
+      - ./config/certbot/cloudflare:/dns
+    entrypoint: /bin/sh
+    # To customize, use docker compose.override.yml
+    command:
+      - "-c"
+      - |
+        certbot certonly --dns-cloudflare --dns-cloudflare-credentials /dns/credentials.ini --dns-cloudflare-propagation-seconds 30 --non-interactive --agree-tos --email ${CERTBOT_EMAIL} -d domain-a.tld -d '*.domain-a.tld'
+
+        certbot certonly --dns-cloudflare --dns-cloudflare-credentials /dns/credentials.ini --dns-cloudflare-propagation-seconds 30 --non-interactive --agree-tos --email ${CERTBOT_EMAIL} -d domain-b.tld -d '*.domain-b.tld'
+
+        while true; do 
+          certbot renew --quiet; 
+          sleep 12h; 
+        done
+
+networks:
+  nginx-net:
+    name: nginx-net
+    driver: bridge
+    enable_ipv6: false
+
+volumes:
+  git-work:
