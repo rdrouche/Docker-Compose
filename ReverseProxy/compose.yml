@@ -12,7 +12,10 @@ services:
       - NGINX_WORKER_PROCESSES="${NGINX_WORKER_PROCESSES:-auto}"
       - NGINX_WORKER_CONNECTIONS="${NGINX_WORKER_CONNECTIONS:-768}"
     volumes:
-      - ./nginx/config:/etc/nginx
+      - ./nginx/config/conf.d:/etc/nginx/conf.d
+      - ./nginx/config/sites:/etc/nginx/sites
+      - ./nginx/config/snippets:/etc/nginx/snippets
+      - ./nginx/config/streams:/etc/nginx/streams
       - ./nginx/webroot:/var/www
       - ./nginx/logs:/var/log/nginx
       - ./nginx/cache:/var/cache/nginx
@@ -39,7 +42,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       # Mapping Folders
-      - ./nginx/config/:/nginx
+      - ./nginx/config/conf.d:/nginx/conf
+      - ./nginx/config/sites:/nginx/sites
+      - ./nginx/config/snippets:/nginx/snippets
+      - ./nginx/config/streams:/nginx/streams
       - ./nginx/cache:/var/cache/nginx
       - ./nginx/logs:/nginx/logs:ro
       - ./certificats:/certificats
