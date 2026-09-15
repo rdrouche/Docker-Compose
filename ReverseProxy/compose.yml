@@ -33,7 +33,9 @@ services:
       - API_TOKEN=${NGX_DHB_API_TOKEN:?changeme-set-in-env-generate-with-openssl-rand-hex-32}
       - WEBHOOK_SECRET=${NGX_DHB_WEBHOOK_SECRET:?changeme-set-in-env-generate-with-openssl-rand-hex-32}
       - SESSION_SECRET=${NGX_DHB_SESSION_SECRET:?cchangeme-set-in-env-generate-with-openssl-rand-hex-32}
+      - NGINX_CONTAINER=${NGINX_CONTAINER_NAME:-nginx}
       - NGINX_NETWORK=${NGINX_NETWORK}
+      - NGINX_VTS_URL=http://${NGINX_CONTAINER_NAME}:8080/status.json
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       # Mapping Folders
