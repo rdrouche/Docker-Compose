@@ -61,6 +61,28 @@ services:
     environment:
       - TEMPLATE_NAME=${ERROR_PAGES_TEMPLATE:-connection}
 
+  nginx-analyzer:
+    image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy-dashboard-analyzer:${NGX_ANA_TAG:-12.1.10}
+    restart: ${RESTART_POLICY:-always}
+    container_name: ngx-analyzer
+    profiles: ["analyzer", "all"]
+    networks:
+      - nginx-net
+    environment:
+      - LOGS_DIR=/nginx/logs
+      - DB_PATH=/analyzer/state.db
+      - LOG_PATTERN=${ANALYZER_LOG_PATTERN:-\.access\.log$$}
+      - LEARNING_DAYS=${ANALYZER_LEARNING_DAYS:-21}
+      - SIGMA_THRESHOLD=${ANALYZER_SIGMA:-6}
+      - BF_MIN_FAILURES=${ANALYZER_BF_MIN:-15}
+      - SCAN_MIN_REQUESTS=${ANALYZER_SCAN_MIN:-40}
+      - FLOOD_MIN_REQUESTS=${ANALYZER_FLOOD_MIN:-600}
+      - ALERT_RETENTION_DAYS=${ANALYZER_ALERT_RETENTION:-90}
+    volumes:
+      - ./logs:/nginx/logs:ro
+      - ./config/analyzer:/analyzer
+      - ./geoip_data:/geoip:ro
+
   geoipupdate:
     image: maxmindinc/geoipupdate:${GEOIPUPDATE_TAG:-latest}
     restart: ${RESTART_POLICY:-always}
