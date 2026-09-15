@@ -24,7 +24,7 @@ services:
       - ./geoip_data:/geoip
   
   nginx-dashboard:
-    image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy-dashboard:${NGX_DHB_TAG:-12.1.16}
+    image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy-dashboard:${NGX_DHB_TAG:-12.1.17}
     restart: ${RESTART_POLICY:-always}
     container_name: ${NGX_DHB_CONTAINER_NAME:-nginx-dashboard}
     networks:
@@ -70,7 +70,7 @@ services:
       - TEMPLATE_NAME=${ERROR_PAGES_TEMPLATE:-connection}
 
   nginx-analyzer:
-    image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy-dashboard-analyzer:${NGX_ANA_TAG:-12.1.10}
+    image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy-dashboard-analyzer:${NGX_ANA_TAG:-12.1.17}
     restart: ${RESTART_POLICY:-always}
     container_name: ngx-analyzer
     profiles: ["analyzer", "all"]
