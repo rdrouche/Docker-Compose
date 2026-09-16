@@ -68,6 +68,8 @@ services:
       - nginx-net
     environment:
       - TEMPLATE_NAME=${ERROR_PAGES_TEMPLATE:-connection}
+    depends_on:
+      - nginx
 
   nginx-analyzer:
     image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy-dashboard-analyzer:${NGX_ANA_TAG:-12.1.17}
