@@ -92,6 +92,9 @@ services:
       - ./logs:/nginx/logs:ro
       - ./config/analyzer:/analyzer
       - ./geoip_data:/geoip:ro
+    depends_on:
+      - nginx
+      - nginx-dashboard
 
   geoipupdate:
     image: maxmindinc/geoipupdate:${GEOIPUPDATE_TAG:-latest}
