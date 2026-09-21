@@ -313,3 +313,12 @@ Plusieurs intégrations sont également disponibles afin d’étendre les foncti
 * **GoAccess** : fournit des statistiques sur le trafic web à partir des fichiers `access.log` de Nginx ;
 * **GoDNS** : permet de gérer dynamiquement les enregistrements DNS ;
 * **SSL / Certbot** : permet de générer des certificats **Let's Encrypt** à l’aide du challenge HTTP.
+
+## Changelog
+
+### 21/09/2026 - 12.5.0
+
+Sortie de la version 12.5.0
+
+- Nettoyage du fichier compose.yml, gestion des fonctionnalités supplémentaires depuis le Dashboard
+- Passage de la configuration des fonctionnalités directement depuis le dashboard, cette solution permet une configuration depuis l'interface Web et l'activation de celle-ci sans avoir besoin de redémarrer le conteneur
