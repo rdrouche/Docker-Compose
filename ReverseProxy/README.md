@@ -1,5 +1,8 @@
 # Reverse proxy Nginx avec interface Web
 
+>Malgrès la version 12.X.X : Nginx Dashboard (Nginx C****) est en cours de developpement.
+>La version stable arrive sous peu :)
+
 ## Presentation
 
 **Nginx, sans compromis.**
