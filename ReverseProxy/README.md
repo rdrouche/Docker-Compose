@@ -319,6 +319,14 @@ Plusieurs intégrations sont également disponibles afin d’étendre les foncti
 
 ## Changelog
 
+### 25/09/2026 - 12.16.0
+
+- Modification general pour facilite le deploiement de **Nginx Control**
+  - si mot de passe du compte admin est admin = generation aleatoire de celui-ci et visible dans les logs docker une fois
+  - API_TOKEN et WEBHOOK_SECRET sont maintenant generer depuis l'interfacer web
+
+Si les var d'ENV sont toujours présente, celle-ci prennet le dessus.
+
 ### 21/09/2026 - 12.5.0
 
 Sortie de la version 12.5.0
