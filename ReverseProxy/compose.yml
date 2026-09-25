@@ -24,7 +24,7 @@ services:
       - ./geoip_data:/geoip
   
   nginx-dashboard:
-    image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy-dashboard:${NGX_DHB_TAG:-12.3.5}
+    image: forge.rdr-it.com/dockerfiles/nginx-reverse-proxy-dashboard:${NGX_DHB_TAG:-12.15.0}
     restart: ${RESTART_POLICY:-always}
     container_name: ${NGX_DHB_CONTAINER_NAME:-nginx-dashboard}
     networks:
