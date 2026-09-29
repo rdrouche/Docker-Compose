@@ -1,19 +1,286 @@
-# Reverse proxy Nginx avec interface Web
+# Nginx Reverse Proxy Stack
 
->Malgrès la version 12.X.X : Nginx Dashboard (Nginx C****) est en cours de developpement.
->La version stable arrive sous peu :)
+Docker Compose stack for deploying an **Nginx reverse proxy with Nginx Control**.
 
-## Presentation
+This repository contains the files required to deploy a complete Nginx reverse proxy environment, including:
 
-**Nginx, sans compromis.**
+* Nginx
+* Nginx Control
+* SSL certificates
+* Let's Encrypt / Certbot
+* GeoIP data
+* Nginx logs and cache
+* GoAccess
+* Nginx Analyzer
+* Local configuration backups
+* Git-based configuration management
 
-Cette stack Docker propose un environnement Nginx prêt à l'emploi pour déployer et administrer un reverse proxy tout en conservant la philosophie et la configuration native de Nginx.
+The stack is designed to work with **Nginx Control** and keeps the standard Nginx configuration structure.
 
-L'objectif du projet est simple : **faciliter l'exploitation de Nginx sans ajouter une nouvelle couche d'abstraction**.
+## 🌐 Project
 
-Contrairement à certaines solutions de reverse proxy qui imposent leur propre syntaxe, leurs conventions ou leur manière de déclarer les services, cette stack utilise directement les fichiers de configuration Nginx.
+* **Nginx Control website:** https://nginx-control.rdr-it.com
+* **Nginx Control documentation:** https://docs.nginx-control.rdr-it.com/
+* **Nginx Control source code:** https://forge.rdr-it.com/Nginx/nginx-control
+* **This deployment repository:** https://forge.rdr-it.com/romain/Docker-Compose/src/branch/main/ReverseProxy
 
-Si vous savez configurer Nginx, vous savez déjà utiliser cette stack.
+## 🏗️ Architecture
+
+The stack is composed of two main containers:
+
+```text
+                         Internet / LAN
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │        Nginx        │
+                    │   Reverse Proxy     │
+                    │                     │
+                    │  HTTP / HTTPS       │
+                    │  VHosts              │
+                    │  SSL                │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    │                     │
+                    ▼                     ▼
+              Applications          Nginx Control
+                                    Dashboard / API
+                                         │
+                 ┌───────────────────────┼──────────────────────┐
+                 │                       │                      │
+                 ▼                       ▼                      ▼
+              Docker                  GitOps                GoAccess
+              Socket                 Configuration           Analyzer
+```
+
+Both Nginx and Nginx Control are connected to the `nginx-net` Docker network.
+
+Nginx Control also has access to the Docker socket in order to provide Docker-related features and Nginx container control.
+
+## 📂 Directory structure
+
+The stack uses bind mounts so that the configuration and data remain directly accessible on the host.
+
+```text
+ReverseProxy/
+├── compose.yml
+├── sample.env
+├── nginx-dashboard.env
+│
+├── nginx/
+│   ├── config/
+│   │   ├── conf.d/
+│   │   ├── sites/
+│   │   ├── snippets/
+│   │   └── streams/
+│   ├── webroot/
+│   ├── logs/
+│   └── cache/
+│
+├── certificats/
+│   ├── ssl/
+│   └── certbot/
+│
+├── geoip_data/
+│
+├── config/
+│   └── nginx-dashboard/
+│       ├── config/
+│       └── goaccess/
+│
+└── backups/
+```
+
+The configuration structure follows the standard organization used by Nginx Control:
+
+* `nginx/config/conf.d/` — global HTTP configuration
+* `nginx/config/sites/` — virtual hosts
+* `nginx/config/snippets/` — reusable configuration snippets
+* `nginx/config/streams/` — TCP/UDP stream configuration
+* `nginx/logs/` — Nginx logs
+* `nginx/cache/` — Nginx cache
+* `certificats/ssl/` — manually managed SSL certificates
+* `certificats/certbot/` — Let's Encrypt / Certbot data
+* `geoip_data/` — GeoIP databases
+* `config/nginx-dashboard/` — Nginx Control configuration and GoAccess data
+* `backups/` — local configuration backups
+
+## 🚀 Deployment
+
+### Requirements
+
+You need:
+
+* Docker
+* Docker Compose
+* A Linux server
+* Ports `80` and `443` available for Nginx
+
+Clone or copy this directory to your server.
+
+For example:
+
+```bash
+mkdir -p /containers/reverse-proxy
+cd /containers/reverse-proxy
+```
+
+### Configure the environment
+
+Copy the sample environment file:
+
+```bash
+cp sample.env .env
+```
+
+Edit the values according to your environment.
+
+The main parameters include:
+
+```dotenv
+RESTART_POLICY=always
+NGINX_NETWORK=nginx-net
+
+NGINX_TAG=1.30.5
+NGINX_CONTAINER_NAME=nginx
+NGINX_WORKER_PROCESSES=auto
+NGINX_WORKER_CONNECTIONS=768
+
+NGX_DHB_CONTAINER_NAME=nginx-dashboard
+```
+
+The stack uses version tags for both the Nginx image and the Nginx Control image, which can be overridden through the `.env` file.
+
+## ▶️ Start the stack
+
+Start the stack with:
+
+```bash
+docker compose up -d
+```
+
+Check the containers:
+
+```bash
+docker compose ps
+```
+
+View the logs:
+
+```bash
+docker compose logs -f
+```
+
+Nginx automatically validates its configuration when starting.
+
+If the configuration is invalid, check the Nginx container logs:
+
+```bash
+docker compose logs nginx
+```
+
+## ⚙️ Customizing the deployment
+
+The main `compose.yml` file is intended to remain as close as possible to the upstream stack definition.
+
+For local customizations, use Docker Compose's override mechanism.
+
+Create:
+
+```text
+compose.override.yml
+```
+
+For example, to publish Nginx Control directly on a local port:
+
+```yaml
+services:
+  nginx-dashboard:
+    ports:
+      - "3000:3000"
+```
+
+Then start the stack normally:
+
+```bash
+docker compose up -d
+```
+
+Docker Compose automatically merges `compose.yml` and `compose.override.yml`.
+
+This makes it possible to customize:
+
+* Ports
+* Volumes
+* Networks
+* Environment variables
+* Resource limits
+* Additional services
+
+without modifying the main stack file.
+
+## 🔐 SSL certificates
+
+The stack provides two locations for certificates:
+
+```text
+certificats/
+├── ssl/
+└── certbot/
+```
+
+### Manual certificates
+
+Certificates can be placed in:
+
+```text
+certificats/ssl/
+```
+
+They are available inside the Nginx container under:
+
+```text
+/ssl
+```
+
+Example:
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name example.com;
+
+    ssl_certificate /ssl/example.com.crt;
+    ssl_certificate_key /ssl/example.com.key;
+
+    location / {
+        proxy_pass http://backend:80;
+    }
+}
+```
+
+### Let's Encrypt / Certbot
+
+Certbot data is stored in:
+
+```text
+certificats/certbot/
+```
+
+and mounted inside the Nginx container as:
+
+```text
+/etc/letsencrypt
+```
+
+This follows the standard Certbot directory structure and makes certificate management easier to migrate or reuse.
+
+For complete certificate management instructions, see the Nginx Control documentation.
+
+## 🧩 Nginx configuration
+
+Nginx configuration files are stored directly on the host.
 
 ```text
 nginx/config/
@@ -23,178 +290,360 @@ nginx/config/
 └── streams/
 ```
 
-Vos configurations Nginx existantes peuvent ainsi être réutilisées directement, avec seulement quelques adaptations si nécessaire.
+This allows you to edit the configuration using your preferred editor, Git, or Nginx Control.
 
-Mais la stack ne se limite pas à fournir un conteneur Nginx. Elle ajoute autour du moteur un ensemble d'outils permettant de simplifier son administration au quotidien :
+For example:
 
-* tableau de bord et monitoring ;
-* visualisation et gestion des configurations ;
-* consultation des logs en temps réel ;
-* gestion des certificats ;
-* sauvegarde des configurations ;
-* validation et rechargement de Nginx ;
-* gestion du cache ;
-* déploiement Git / GitOps ;
-* intégration avec CrowdSec ;
-* analyse avancée des logs ;
-* intégration ModSecurity et Coraza ;
-* statistiques GoAccess ;
-* gestion DNS avec GoDNS ;
-* génération de certificats Let's Encrypt.
-
-L'approche est volontairement **modulaire** : le cœur de la stack reste un Nginx classique et les fonctionnalités supplémentaires peuvent être ajoutées en fonction des besoins.
-
-### Le principe
-
-**Nginx reste le moteur. La stack s'occupe du reste.**
-
-Vous conservez la puissance et la flexibilité de Nginx, notamment l'utilisation de directives comme `map`, `limit_req`, `proxy_cache`, GeoIP ou encore les nombreuses possibilités offertes par les configurations natives.
-
-L'objectif n'est donc pas de remplacer Nginx par une nouvelle solution, mais de fournir **un environnement complet autour de Nginx pour faciliter son déploiement, son administration, sa supervision et son intégration avec d'autres outils.**
-
-
-## Concept d'utilisation de Nginx
-
-L’objectif de cette stack, et plus particulièrement de la partie Nginx, a été de conserver une configuration aussi proche que possible d’une utilisation classique de Nginx.
-
-L’idée est de ne pas imposer une nouvelle convention de configuration, comme peuvent le faire certaines solutions de reverse proxy « packagées », qui nécessitent d’apprendre une syntaxe ou une organisation spécifique.
-
-Cette approche permet une adoption beaucoup plus simple : si vous disposez déjà de configurations Nginx, celles-ci devraient pouvoir fonctionner directement, ou ne nécessiter que quelques adaptations mineures pour être intégrées à la stack.
-
-Elle permet également de continuer à exploiter facilement l’ensemble des fonctionnalités natives de Nginx, qui peuvent parfois être limitées ou moins accessibles avec certaines solutions de reverse proxy.
-
-On peut notamment continuer à utiliser :
-
-- le cache de fichiers ;
-- le rate limiting avec les directives `limit_req` et `limit_conn` ;
-- GeoIP ;
-- les directives `map` pour créer des règles de configuration dynamiques ;
-- et plus généralement les nombreuses directives disponibles nativement dans Nginx.
-
-Le choix a donc été de ne pas chercher à masquer Nginx derrière une couche d’abstraction, mais au contraire de conserver toute sa souplesse tout en simplifiant son déploiement et son exploitation.
-
-L’ensemble des fichiers de configuration Nginx se trouve dans le répertoire nginx/config.
-
-La configuration est organisée en plusieurs répertoires afin de conserver une structure claire :
-
-- conf.d : configurations générales de Nginx chargé dans le contexte `http { }`
-- sites : configurations des différents sites et virtual hosts
-- snippets : fragments de configuration réutilisables 
-- streams : configurations pour les connexions TCP/UDP
-
-Pour qu’un fichier soit automatiquement chargé dans la configuration Nginx, il doit impérativement avoir l’extension .conf.
-
-Cette convention permet également de désactiver facilement une configuration sans avoir à supprimer le fichier. Il suffit de modifier son extension, par exemple :
-
-```
-site.conf
+```text
+nginx/config/sites/example.com.conf
 ```
 
-devient :
+```nginx
+server {
+    listen 80;
+    server_name example.com;
 
+    location / {
+        proxy_pass http://192.168.1.10:8080;
+    }
+}
 ```
-site.conf.DISABLE
+
+After modifying the configuration, Nginx can be tested and reloaded through Nginx Control.
+
+## 🐳 Docker network
+
+The stack creates the following Docker network:
+
+```text
+nginx-net
 ```
 
-Le fichier n’étant alors plus chargé par Nginx, la configuration peut être conservée pour être réactivée ultérieurement en lui redonnant simplement l’extension .conf.
+Applications that need to be published through Nginx can be connected to this network.
 
-## Les différentes images de Nginx
+For example:
 
-Pour configurer votre reverse proxy, trois images Docker sont disponibles, selon les fonctionnalités dont vous avez besoin :
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    networks:
+      - nginx-net
 
-- Nginx standard : basée sur la version stable de Nginx (1.30.4) ;
-- Nginx avec ModSecurity : permet d’ajouter des fonctionnalités WAF à Nginx (1.30.4-waf) ;
-- Nginx avec Coraza : intègre le WAF nouvelle génération Coraza (1.30.4-coraza). Cette version est actuellement considérée comme expérimentale.
+networks:
+  nginx-net:
+    external: true
+```
 
-Le fonctionnement et la configuration de Nginx restent identiques quelle que soit l’image utilisée. Le choix de l’image permet simplement d'activer ou non les fonctionnalités WAF dont vous avez besoin.
+This allows Nginx to communicate directly with the application container using its Docker service name.
 
-Pour une utilisation classique en reverse proxy, l’image Nginx standard est donc suffisante. Si vous souhaitez ajouter une couche de protection WAF, vous pouvez utiliser la version ModSecurity ou expérimenter Coraza.
+Nginx Control can also use this network for its Docker auto-configuration features.
 
-## Prérequis
+## 🤖 Docker auto-configuration
 
-Un serveur Linux avec Docker et Docker compose d'installé
+Nginx Control supports automatic publication of Docker containers through Docker labels.
 
-> La documentation a été faite depuis un serveur Debian 13
+Example:
 
-## Installation et démarrage rapide
+```yaml
+labels:
+  - "nginx-control.enable=true"
+  - "nginx-control.vhost.server_name=app.example.com"
+  - "nginx-control.vhost.location01=/"
+  - "nginx-control.vhost.location01.proxy_pass=http://web:80"
+  - "nginx-control.network=nginx-net"
+```
 
-1. Sur le serveur créer un dossier qui va contenir le fichiers et dossiers du stack.
+The container can then be detected by Nginx Control and published through an automatically generated Nginx Virtual Host.
+
+See the Nginx Control documentation for the complete label reference and remote Docker agent configuration.
+
+## 📊 Monitoring and logs
+
+The stack provides the directories required by Nginx Control for monitoring and analysis:
+
+```text
+nginx/logs/
+nginx/cache/
+geoip_data/
+config/nginx-dashboard/goaccess/
+```
+
+These are used by features such as:
+
+* Real-time Nginx logs
+* Nginx Analyzer
+* GoAccess
+* GeoIP analysis
+* Cache management
+* Backend monitoring
+
+## 💾 Backups
+
+Nginx Control can create local configuration backups.
+
+They are stored in:
+
+```text
+backups/
+```
+
+The directory is mounted into Nginx Control as:
+
+```text
+/nginx/backups
+```
+
+This allows configuration backups to remain available independently of the container lifecycle.
+
+## 🔄 GitOps
+
+Nginx Control can use a Git repository as the source of truth for Nginx configuration.
+
+The following configuration directories can be managed through Git:
+
+```text
+nginx/config/conf.d/
+nginx/config/sites/
+nginx/config/snippets/
+nginx/config/streams/
+certificats/ssl/
+```
+
+This allows you to version:
+
+* Virtual Hosts
+* Nginx global configuration
+* Snippets
+* Stream configurations
+* SSL certificates
+
+and deploy validated configurations through Nginx Control.
+
+See the documentation for the complete GitOps configuration.
+
+## 🔧 Updating the stack
+
+To update the stack, modify the image versions in `.env`.
+
+For example:
+
+```dotenv
+NGINX_TAG=1.30.5
+NGX_DHB_TAG=x.x.x
+```
+
+Then recreate the containers:
 
 ```bash
-mkdir -p /containers/nginx
-cd /containers/nginx
+docker compose pull
+docker compose up -d
 ```
 
-2. Cloner les fichiers disponibles sur le [dépôt](https://forge.rdr-it.com/romain/Docker-Compose/src/branch/main/ReverseProxy) :
+The configuration and data stored in the bind-mounted directories are preserved.
+
+## 📚 Documentation
+
+For complete information about Nginx Control and its features:
+
+**Documentation:**
+https://docs.nginx-control.rdr-it.com/
+
+**Project website:**
+https://nginx-control.rdr-it.com
+
+## 🔗 Related projects
+
+### Nginx Control
+
+The dashboard used to manage and monitor this stack.
+
+https://forge.rdr-it.com/Nginx/nginx-control
+
+### Nginx Reverse Proxy image
+
+The Nginx image used by this stack:
+
+https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy
+
+## 🇫🇷 Français
+
+# Stack Nginx Reverse Proxy
+
+Ce dépôt contient les fichiers Docker Compose permettant de déployer un **reverse proxy Nginx avec Nginx Control**.
+
+Le stack fournit une base complète pour déployer :
+
+* Nginx
+* Nginx Control
+* Certificats SSL
+* Let's Encrypt / Certbot
+* GeoIP
+* Logs Nginx
+* Cache Nginx
+* GoAccess
+* Nginx Analyzer
+* Sauvegardes locales
+* Gestion de configuration avec Git
+
+L'objectif est de disposer d'un **stack prêt à déployer**, tout en conservant une configuration Nginx classique et directement accessible sur le système de fichiers.
+
+## 🌐 Projet
+
+* **Site Nginx Control :** https://nginx-control.rdr-it.com
+* **Documentation :** https://docs.nginx-control.rdr-it.com/
+* **Code source Nginx Control :** https://forge.rdr-it.com/Nginx/nginx-control
+* **Dépôt de déploiement :** https://forge.rdr-it.com/romain/Docker-Compose/src/branch/main/ReverseProxy
+
+## 🏗️ Architecture
+
+Le stack repose principalement sur deux conteneurs :
+
+```text
+                         Internet / LAN
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │        Nginx        │
+                    │   Reverse Proxy     │
+                    │                     │
+                    │  HTTP / HTTPS       │
+                    │  VHosts             │
+                    │  SSL               │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    │                     │
+                    ▼                     ▼
+              Applications          Nginx Control
+                                    Dashboard / API
+                                         │
+                 ┌───────────────────────┼──────────────────────┐
+                 │                       │                      │
+                 ▼                       ▼                      ▼
+              Docker                  GitOps                GoAccess
+              Socket                 Configuration           Analyzer
+```
+
+Nginx et Nginx Control sont connectés au réseau Docker `nginx-net`.
+
+Nginx Control dispose également d'un accès au socket Docker afin de pouvoir effectuer les opérations liées au conteneur Nginx et aux fonctionnalités d'auto-configuration Docker.
+
+## 📂 Arborescence
+
+Les données du stack sont stockées à l'aide de bind mounts afin de rester directement accessibles sur l'hôte.
+
+```text
+ReverseProxy/
+├── compose.yml
+├── sample.env
+├── nginx-dashboard.env
+│
+├── nginx/
+│   ├── config/
+│   │   ├── conf.d/
+│   │   ├── sites/
+│   │   ├── snippets/
+│   │   └── streams/
+│   ├── webroot/
+│   ├── logs/
+│   └── cache/
+│
+├── certificats/
+│   ├── ssl/
+│   └── certbot/
+│
+├── geoip_data/
+│
+├── config/
+│   └── nginx-dashboard/
+│       ├── config/
+│       └── goaccess/
+│
+└── backups/
+```
+
+## 🚀 Déploiement
+
+### Prérequis
+
+Vous devez disposer de :
+
+* Docker
+* Docker Compose
+* Un serveur Linux
+* Des ports `80` et `443` disponibles
+
+Créez le dossier de déploiement :
 
 ```bash
-bash <(wget -qO- https://forge.rdr-it.com/romain/Docker-Compose/raw/branch/main/get.sh) ReverseProxy
+mkdir -p /containers/reverse-proxy
+cd /containers/reverse-proxy
 ```
 
-3. Copier le fichier `sample.env` en nommant `.env`
+### Configuration
+
+Copiez le fichier d'exemple :
 
 ```bash
 cp sample.env .env
 ```
 
-4. Editer le fichier `.env` :
+Puis adaptez les valeurs à votre environnement.
 
-```bash
-nano .env
+Les principaux paramètres sont :
+
+```dotenv
+RESTART_POLICY=always
+NGINX_NETWORK=nginx-net
+
+NGINX_TAG=1.30.5
+NGINX_CONTAINER_NAME=nginx
+NGINX_WORKER_PROCESSES=auto
+NGINX_WORKER_CONNECTIONS=768
+
+NGX_DHB_CONTAINER_NAME=nginx-dashboard
 ```
 
-5. Configurer le token et les secrets, un générateur est disponible [ici](https://tools.rdr-it.com/#randgen).
+Les versions des images Nginx et Nginx Control peuvent être modifiées depuis le fichier `.env`.
 
-```ini
-NGX_DHB_API_TOKEN=00abe4d1b52377ba70abd298ff8bc5454202a475f8fff80418cc78c61fd1135d
-NGX_DHB_WEBHOOK_SECRET=c1f4446d99ae84ff76b3d925858709ff7cd3852e957bf389c3b0322ba6a66a68
-NGX_DHB_SESSION_SECRET=9f25ba812bf03df536d1ef99bb287074dcf35380941b2b5bba81c97d409133c4
-```
-
-6. A partir de là, il est possible de démarrer les conteneurs pour avoir nginx
+## ▶️ Démarrer le stack
 
 ```bash
 docker compose up -d
 ```
 
-> Si les images ne sont pas présentes sur le serveur, elle seront automatiques télécharger lors du démarrage.
-
-A partir de cette étape, le reverse proxy est opérationnel.
-
-### Configurer l'accès au Tableau de bord
-
-Par défaut, le tableau de bord n'est pas publié, vous avez deux solutions : 
-
-- Publication par mappage de port au niveau Docker
-- Créer un virtualhost dédié
-
-Les identifiants par défaut sont : 
-- Login : admin
-- Mot de passe : changeme
-
-### Changer le mot de passe par défaut
-
-Avant de configurer l'accès, je vous conseille de changer le mot de passe par défaut.
-
-Ouvrir le fichier **users.yaml** qui se trouve : `./config/nginx-dashboard/config/`
-
-> Lors du démarrage du conteneur, celui-ci sera chiffré et donc plus en clair dans le fichier ***users.yaml***
+Vérifiez l'état des conteneurs :
 
 ```bash
-nano config/nginx-dashboard/config/users.yml
+docker compose ps
 ```
 
-Puis changer la valeur du paramètre `password:`.
-
-### Publication par mappage port 
-
-1. Créer un fichier override qui va permettre de modifier le stack de service sans toucher au `compose.yml`.
+Pour consulter les logs :
 
 ```bash
-nano compose.override.yml
+docker compose logs -f
 ```
 
-2. Ajouter le code suivant : 
+La configuration Nginx est automatiquement vérifiée au démarrage.
+
+En cas d'erreur :
+
+```bash
+docker compose logs nginx
+```
+
+## ⚙️ Personnaliser le déploiement
+
+Le fichier `compose.yml` doit rester autant que possible proche de la configuration du stack.
+
+Pour vos personnalisations locales, utilisez :
+
+```text
+compose.override.yml
+```
+
+Par exemple :
 
 ```yaml
 services:
@@ -203,133 +652,198 @@ services:
       - "3000:3000"
 ```
 
-3. Redémarrer les conteneurs :
+Puis :
 
 ```bash
 docker compose up -d
 ```
 
-> Cela devrait seulement recréer le conteneur du tableau de bord Nginx
+Docker Compose fusionnera automatiquement `compose.yml` et `compose.override.yml`.
 
-### Créer un virtual host Nginx
+Cela permet de personnaliser notamment :
 
-Une autre solution est de créer un virtualhost et passer par Nginx pour accéder au tableau de bord.
+* les ports ;
+* les volumes ;
+* les réseaux ;
+* les variables d'environnement ;
+* les limites de ressources ;
+* les services supplémentaires.
 
-> La configuration propose utilise volontaire http et non https à ce stade
+## 🔐 Certificats SSL
 
-1. Définir un enregistrement DNS et le faire pointer vers l'adresse IP du serveur.
+Les certificats sont organisés dans :
 
-2. Dans le dossier `./nginx/config/sites` créer un fichier `dashboard.conf`
- 
-> Il est impératif que l'extension du fichier soit .conf pour qu'il soit chargé par Nginx
-
-
-3. Exemple de virtualhost
-
-```nginx
-server {
-    listen 80;
-    server_name nginx-dashboard.domain.tld;
-
-    access_log /var/log/nginx/nginx-dashboard.domain.tld.access.log;
-    error_log /var/log/nginx/nginx-dashboard.domain.tld.error.log;
-    
-    # Disable VTS on Dashboard
-    vhost_traffic_status off;
-
-    include snippets/remove-header.conf;
-
-    set $backend http://nginx-dashboard:3000;
-    resolver 127.0.0.11 valid=30s;
-
-    location / {
-        proxy_pass $backend;
-        proxy_read_timeout 60s;
-        include snippets/proxy-common.conf;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $http_connection;
-    }
-}
+```text
+certificats/
+├── ssl/
+└── certbot/
 ```
 
-4. Tester la configuration de Nginx :
+Les certificats manuels sont disponibles dans Nginx sous :
+
+```text
+/ssl
+```
+
+Les données Certbot sont disponibles sous :
+
+```text
+/etc/letsencrypt
+```
+
+Cette organisation permet notamment de conserver une structure compatible avec les outils Nginx et Certbot classiques.
+
+## 🧩 Configuration Nginx
+
+La configuration est directement disponible sur l'hôte :
+
+```text
+nginx/config/
+├── conf.d/
+├── sites/
+├── snippets/
+└── streams/
+```
+
+Vous pouvez donc modifier les fichiers avec votre éditeur habituel, les gérer avec Git ou utiliser Nginx Control.
+
+## 🐳 Réseau Docker
+
+Le stack crée le réseau :
+
+```text
+nginx-net
+```
+
+Les applications devant être publiées par Nginx peuvent être connectées à ce réseau :
+
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    networks:
+      - nginx-net
+
+networks:
+  nginx-net:
+    external: true
+```
+
+Nginx peut alors communiquer directement avec le conteneur à travers son nom Docker.
+
+Ce réseau est également utilisé par les fonctionnalités d'auto-configuration Docker de Nginx Control.
+
+## 🤖 Auto-configuration Docker
+
+Nginx Control permet de publier automatiquement les conteneurs Docker grâce aux labels.
+
+Exemple :
+
+```yaml
+labels:
+  - "nginx-control.enable=true"
+  - "nginx-control.vhost.server_name=app.example.com"
+  - "nginx-control.vhost.location01=/"
+  - "nginx-control.vhost.location01.proxy_pass=http://web:80"
+  - "nginx-control.network=nginx-net"
+```
+
+Nginx Control détecte alors le conteneur et peut générer automatiquement le Virtual Host Nginx correspondant.
+
+La documentation Nginx Control détaille les labels disponibles ainsi que la publication de conteneurs sur des hôtes Docker distants.
+
+## 📊 Supervision et logs
+
+Les répertoires nécessaires aux fonctionnalités de supervision et d'analyse sont persistants :
+
+```text
+nginx/logs/
+nginx/cache/
+geoip_data/
+config/nginx-dashboard/goaccess/
+```
+
+Ils sont utilisés notamment pour :
+
+* les logs Nginx en temps réel ;
+* Nginx Analyzer ;
+* GoAccess ;
+* l'analyse GeoIP ;
+* la gestion du cache ;
+* la supervision des backends.
+
+## 💾 Sauvegardes
+
+Les sauvegardes locales de configuration sont stockées dans :
+
+```text
+backups/
+```
+
+Elles sont accessibles depuis Nginx Control sous :
+
+```text
+/nginx/backups
+```
+
+Les sauvegardes restent donc disponibles indépendamment du cycle de vie du conteneur.
+
+## 🔄 GitOps
+
+Nginx Control peut utiliser un dépôt Git comme **source de vérité** pour la configuration Nginx.
+
+Les répertoires suivants peuvent notamment être versionnés :
+
+```text
+nginx/config/conf.d/
+nginx/config/sites/
+nginx/config/snippets/
+nginx/config/streams/
+certificats/ssl/
+```
+
+Cela permet de conserver l'historique des modifications et de déployer une configuration validée depuis Nginx Control.
+
+## 🔧 Mise à jour
+
+Les versions des images peuvent être modifiées dans `.env`.
+
+Par exemple :
+
+```dotenv
+NGINX_TAG=1.30.5
+NGX_DHB_TAG=x.x.x
+```
+
+Puis :
 
 ```bash
-docker compose exec nginx nginx -t
+docker compose pull
+docker compose up -d
 ```
 
-> En cas d'erreur de configuration, corriger là.
+Les configurations et données présentes dans les répertoires montés restent conservées.
 
-5. Recharger la configuration :
+## 📚 Documentation
 
-```bash
-docker compose exec nginx nginx -s reload
-```
+Pour découvrir toutes les fonctionnalités de Nginx Control :
 
-## Découverte et premier pas avec le Dashboard
+**Documentation :**
+https://docs.nginx-control.rdr-it.com/
 
-Une fois connecté au Dashboard, vous arrivez sur une page de "monitoring" qui affiche des métriques fournie par le [module VTS](https://github.com/vozlt/nginx-module-vts) qui a été intégré à l'image Nginx.
+**Site du projet :**
+https://nginx-control.rdr-it.com
 
+## 🔗 Projets associés
 
-La stack propose plusieurs fonctionnalités directement disponibles, **sans configuration supplémentaire**.
+### Nginx Control
 
-### Monitoring
+Dashboard permettant de gérer et superviser ce stack :
 
-* **Monitoring** : supervision de Nginx à l’aide de **VTS (Virtual Host Traffic Status)**.
+https://forge.rdr-it.com/Nginx/nginx-control
 
-### Configuration
+### Nginx Reverse Proxy
 
-La section **Configuration** regroupe les outils permettant de gérer et de consulter la configuration de Nginx :
+Image Nginx utilisée par ce stack :
 
-* **Config files** : permet de visualiser les différents fichiers de configuration de Nginx ;
-* **SSL Certificats** : affiche un aperçu des certificats présents dans les répertoires `certificats/ssl` et `certificats/certbots` ;
-* **Live logs** : permet d'afficher en temps réel le contenu des fichiers de logs, de manière similaire à la commande `tail -f` ;
-* **Sync fichiers ref** : permet de mettre à jour les fichiers de configuration fournis avec la stack ;
-* **Générateur VHost** : éditeur en ligne permettant de générer une configuration de virtual host. La configuration générée n'est toutefois pas automatiquement enregistrée dans le répertoire `sites` ;
-* **Backup** : permet de sauvegarder les fichiers de configuration de Nginx.
-
-### Contrôle
-
-La section **Contrôle** regroupe les différentes actions permettant d'administrer Nginx :
-
-* **Contrôle de Nginx** : permet de tester la configuration Nginx, de recharger la configuration ou de redémarrer le conteneur ;
-* **Cache Nginx** : affiche les métriques concernant le volume du cache et permet de le purger ;
-* **Évènements** : affiche les logs générés par le tableau de bord.
-
-## Les fonctionnalités supplémentaires facultative
-
-Le tableau de bord Nginx peut également être enrichi à l’aide de configurations supplémentaires et s’interfacer avec différents services externes.
-
-### Configuration
-
-* **Déploiement Git** : permet de mettre en place une approche **GitOps** en utilisant un dépôt Git pour gérer les fichiers de configuration Nginx et leur sauvegarde. Les modifications peuvent ainsi être versionnées et déployées depuis le dépôt.
-
-### Intégrations
-
-Plusieurs intégrations sont également disponibles afin d’étendre les fonctionnalités du tableau de bord :
-
-* **CrowdSec** : permet d’afficher les métriques CrowdSec via Prometheus et de bannir des adresses IP directement depuis l’interface à l’aide de l’API CrowdSec ;
-* **Analyse** : s’appuie sur un conteneur supplémentaire, `nginx-analyzer`, pour analyser les logs Nginx et fournir des statistiques et des alertes supplémentaires ;
-* **WAF** : permet de visualiser les logs générés par **ModSecurity** et **Coraza**. Cette fonctionnalité nécessite `nginx-analyzer` ;
-* **Map** : permet de visualiser en temps réel la provenance du trafic. Cette fonctionnalité nécessite également `nginx-analyzer` ;
-* **GoAccess** : fournit des statistiques sur le trafic web à partir des fichiers `access.log` de Nginx ;
-* **GoDNS** : permet de gérer dynamiquement les enregistrements DNS ;
-* **SSL / Certbot** : permet de générer des certificats **Let's Encrypt** à l’aide du challenge HTTP.
-
-## Changelog
-
-### 25/09/2026 - 12.16.0
-
-- Modification general pour facilite le deploiement de **Nginx Control**
-  - si mot de passe du compte admin est admin = generation aleatoire de celui-ci et visible dans les logs docker une fois
-  - API_TOKEN et WEBHOOK_SECRET sont maintenant generer depuis l'interfacer web
-
-Si les var d'ENV sont toujours présente, celle-ci prennet le dessus.
-
-### 21/09/2026 - 12.5.0
-
-Sortie de la version 12.5.0
-
-- Nettoyage du fichier compose.yml, gestion des fonctionnalités supplémentaires depuis le Dashboard
-- Passage de la configuration des fonctionnalités directement depuis le dashboard, cette solution permet une configuration depuis l'interface Web et l'activation de celle-ci sans avoir besoin de redémarrer le conteneur
+https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy
