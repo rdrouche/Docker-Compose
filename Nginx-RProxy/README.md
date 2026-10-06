@@ -1,192 +1,827 @@
-<!-- 20260523-01 -->
-[![Docker Pulls](https://img.shields.io/docker/pulls/rdrit/nginx-rproxy?logo=docker&label=Docker%20Hub)](https://hub.docker.com/r/rdrit/nginx-rproxy)  ![Static Badge](https://img.shields.io/badge/Version-1.30.1-blue?logo=nginx&logoColor=green&logoSize=auto&link=https%3A%2F%2Fforge.rdr-it.com%2FDockerfiles%2F-%2Fpackages%2Fcontainer%2Fnginx-reverse-proxy%2F)
-  [![Dockerfile](https://img.shields.io/badge/Dockerfile-View-blue?logo=docker)](https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy)
+# Nginx Reverse Proxy Stack
 
-# Nginx Reverse Proxy 
+Docker Compose stack for deploying an **Nginx reverse proxy with NGX Ops**.
 
-Ce dépôt contient une solution complète de Reverse Proxy Nginx optimisée, incluant la gestion automatique des certificats SSL (Cloudflare), la géolocalisation IP, et le filtrage avancé des bots.
+This repository contains the files required to deploy a complete Nginx reverse proxy environment, including:
 
-Le dépot de construction de l'image : https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy
+* Nginx
+* NGX Ops
+* SSL certificates
+* Let's Encrypt / Certbot
+* GeoIP data
+* Nginx logs and cache
+* GoAccess
+* Nginx Analyzer
+* Local configuration backups
+* Git-based configuration management
 
-## 🚀 Fonctionnalités
+The stack is designed to work with **NGX Ops** and keeps the standard Nginx configuration structure.
 
-- Nginx RProxy : Serveur haute performance configuré pour le reverse proxy.
-- Certbot & Cloudflare : Automatisation des certificats SSL Wildcard via DNS challenge.
-- Géo-blocage (GeoIP2) : Restriction d'accès par pays via la base MaxMind.
-- Sécurité des Bots : Listes blanches (Good Bots) et listes noires (Bad Bots, IA/Scrapers).
-- Gestion d'Erreurs : Pages d'erreurs personnalisées et esthétiques qui utilise **[error-pages](https://github.com/tarampampam/error-pages)**.
-- Cloudflare Ready : Restauration des IPs réelles des visiteurs derrière le proxy Cloudflare.
-- Module Nginx VTS inclus - [nginx-module-vts](https://github.com/vozlt/nginx-module-vts)
-- Dashboard : visualisation stats, config (https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy-dashboard)
+## 🌐 Project
 
-## 📁 Structure du Projet
+* **NGX Ops website:** https://ngx-ops.net
+* **NGX Ops documentation:** https://docs.ngx-ops.net
+* **NGX Ops source code:** https://forge.rdr-it.com/ngx-ops/ngx-ops
+* **This deployment repository:** https://forge.rdr-it.com/ngx-ops/compose
 
-- conf/ : Fichiers de configuration Nginx globaux.
-- snippets/ : Snippets réutilisables pour le filtrage (bots, pays, etc.).
-- sites/ : Vos fichiers de configuration VirtualHost.
-- certs/ : Certificats SSL générés par Certbot.
-- geoip_data/ : Bases de données MaxMind (mises à jour automatiquement).
+## 🏗️ Architecture
 
-> Afin que les fichiers de configuration soit chargés par Nginx, ils doivent avoir l'extension `.conf`
+The stack is composed of two main containers:
 
-## 🛠️ Installation
-
-### 1. Prérequis
-
-- Docker et Docker Compose.
-- Un compte [Cloudflare](https://www.cloudflare.com/) (pour le DNS Challenge).
-- Un compte [MaxMind](https://www.maxmind.com/) (pour les mises à jour GeoIP2).
-
-### 2. Cloner le dossier
-
-Créer un dossier : 
-
+```text
+                         Internet / LAN
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │        Nginx        │
+                    │   Reverse Proxy     │
+                    │                     │
+                    │  HTTP / HTTPS       │
+                    │  VHosts              │
+                    │  SSL                │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    │                     │
+                    ▼                     ▼
+              Applications          NGX Ops
+                                    Dashboard / API
+                                         │
+                 ┌───────────────────────┼──────────────────────┐
+                 │                       │                      │
+                 ▼                       ▼                      ▼
+              Docker                  GitOps                GoAccess
+              Socket                 Configuration           Analyzer
 ```
-mkdir -p /containers/nginx-rproxy
-cd /containers/nginx-rproxy
+
+Both Nginx and NGX Ops are connected to the `nginx-net` Docker network.
+
+NGX Ops also has access to the Docker socket in order to provide Docker-related features and Nginx container control.
+
+## 📂 Directory structure
+
+The stack uses bind mounts so that the configuration and data remain directly accessible on the host.
+
+```text
+ngx-ops/
+├── compose.yml
+├── sample.env
+├── ngx-ops.env
+│
+├── nginx/
+│   ├── config/
+│   │   ├── conf.d/
+│   │   ├── sites/
+│   │   ├── snippets/
+│   │   └── streams/
+│   ├── webroot/
+│   ├── logs/
+│   └── cache/
+│
+├── certificats/
+│   ├── ssl/
+│   └── certbot/
+│
+├── geoip_data/
+│
+├── config/
+│   └── nginx-dashboard/
+│       ├── config/
+│       └── goaccess/
+│
+└── backups/
 ```
 
-Cloner le dossier : 
+The configuration structure follows the standard organization used by NGX Ops:
 
+* `nginx/config/conf.d/` — global HTTP configuration
+* `nginx/config/sites/` — virtual hosts
+* `nginx/config/snippets/` — reusable configuration snippets
+* `nginx/config/streams/` — TCP/UDP stream configuration
+* `nginx/logs/` — Nginx logs
+* `nginx/cache/` — Nginx cache
+* `certificats/ssl/` — manually managed SSL certificates
+* `certificats/certbot/` — Let's Encrypt / Certbot data
+* `geoip_data/` — GeoIP databases
+* `config/nginx-dashboard/` — NGX Ops configuration and GoAccess data
+* `backups/` — local configuration backups
+
+## 🚀 Deployment
+
+### Requirements
+
+You need:
+
+* Docker
+* Docker Compose
+* A Linux server
+* Ports `80` and `443` available for Nginx
+
+Clone or copy this directory to your server.
+
+For example:
+
+```bash
+mkdir -p /containers/ngx-ops
+cd /containers/ngx-ops
+bash <(wget -qO- https://forge.rdr-it.com/ngx-ops/compose/raw/branch/main/deploy.sh) ngx-ops
 ```
-bash <(wget -qO- https://forge.rdr-it.com/romain/Docker-Compose/raw/branch/main/get.sh) Nginx-RProxy
-```
 
-### 3. Configuration de l'environnement
+### Configure the environment
 
-Renommez sample.env en .env et ajustez les variables :
+Copy the sample environment file:
 
-```
+```bash
 cp sample.env .env
-nano .env
 ```
 
-- Modifiez `CERTBOT_EMAIL` pour les notifications SSL.
-- Renseignez vos identifiants `GEOIPUPDATE_ACCOUNT_ID` et `LICENSE_KEY`.
+Edit the values according to your environment.
 
-Si nécessaire, créer un fichier `docker-compose.override.yml` et personnaliser les services, notamment la commande `certbot` et le réseau `nginx-proxy` dans le cas d'utilisation avec des conteneurs.
+The main parameters include:
 
-### 4. Configuration Cloudflare
+```dotenv
+RESTART_POLICY=always
+NGINX_NETWORK=nginx-net
 
-Créez un dossier cloudflare et un fichier `credentials.ini` à l'intérieur :
+NGINX_TAG=1.30.5
+NGINX_CONTAINER_NAME=nginx
+NGINX_WORKER_PROCESSES=auto
+NGINX_WORKER_CONNECTIONS=768
 
+NGX_DHB_CONTAINER_NAME=ngx-ops-dashboard
 ```
-dns_cloudflare_api_token = VOTRE_TOKEN_API_CLOUDFLARE
+
+Rename `compose.override.yml.sample` to `compose.override.yml` for direct expose NGX Ops Dashboard on port 3000
+
+```bash
+
+The stack uses version tags for both the Nginx image and the NGX Ops image, which can be overridden through the `.env` file.
+
+## ▶️ Start the stack
+
+Start the stack without the -d parameter to see the admin account password, which will be visible upon initial startup :
+
+```bash
+docker compose up
 ```
 
-> Sécurisez le fichier : chmod 600 cloudflare/credentials.ini
+Copy the admin account password and press the 'd' key to detach the session.
 
-### 5. Lancement
+Nginx automatically validates its configuration when starting.
 
-Démarrez les services Nginx et Error-Pages :
+Go to http://ip:3000 in a web browser to access the dashboard.
 
+## ⚙️ Customizing the deployment
+
+The main `compose.yml` file is intended to remain as close as possible to the upstream stack definition.
+
+For local customizations, use Docker Compose's override mechanism.
+
+Create:
+
+```text
+compose.override.yml
 ```
+
+For example, to publish NGX Ops directly on a local port:
+
+```yaml
+services:
+  nginx-dashboard:
+    ports:
+      - "3000:3000"
+```
+
+Then start the stack normally:
+
+```bash
 docker compose up -d
 ```
-*Note : Pour inclure les services de mise à jour GeoIP et Certbot, utilisez les profils :*
 
+Docker Compose automatically merges `compose.yml` and `compose.override.yml`.
+
+This makes it possible to customize:
+
+* Ports
+* Volumes
+* Networks
+* Environment variables
+* Resource limits
+* Additional services
+
+without modifying the main stack file.
+
+## 🔐 SSL certificates
+
+The stack provides two locations for certificates:
+
+```text
+certificats/
+├── ssl/
+└── certbot/
 ```
-docker-compose --profile all up -d
+
+### Manual certificates
+
+Certificates can be placed in:
+
+```text
+certificats/ssl/
 ```
 
-## 🛡️ Utilisation du filtrage
+They are available inside the Nginx container under:
 
-Le projet inclut des outils de filtrage pré-configurés dans le dossier `snippets/`.
-
-### Blocage des bots (IA & Malveillants)
-
-Dans vos fichiers de VirtualHost (`sites/*.conf`), vous pouvez bloquer les bots indésirables :
-
-```
-if ($bad_bot) { return 444; }
-if ($ai_bot) { return 444; }
+```text
+/ssl
 ```
 
-### Restriction par Pays (GeoIP2)
+Example:
 
-Deux politiques sont disponibles par défaut :
+```nginx
+server {
+    listen 443 ssl;
+    server_name example.com;
 
-- `allow-visit-001.conf` : Autorise la France + Good Bots + IPs privées.
-- `allow-visit-002.conf` : Autorise France, Irlande, Royaume-Uni + Good Bots + IPs privées.
+    ssl_certificate /ssl/example.com.crt;
+    ssl_certificate_key /ssl/example.com.key;
 
-> Pour fonctionner ces deux politiques ont besoins des fichiers suivants : `conf/private-ips.conf` et `conf/good-bots.conf`.
-
-Exemple d'application :
-
-```
-if ($allow_visit_001 = 0) {
-    return 403;
+    location / {
+        proxy_pass http://backend:80;
+    }
 }
 ```
-## 🔄 Mise à jour des bases GeoIP
 
-Le service geoipupdate tourne en arrière-plan et vérifie les mises à jour de la base de données MaxMind toutes les 168 heures (hebdomadaire) par défaut.
+### Let's Encrypt / Certbot
 
-## 📝 Personnalisation des certificats
+Certbot data is stored in:
 
-Dans le fichier `docker-compose.yml`, modifiez la commande du service certbot pour inclure vos propres domaines :
-
-```
--d votre-domaine.fr -d '*.votre-domaine.fr'
+```text
+certificats/certbot/
 ```
 
-## Les variables d'environnement
+and mounted inside the Nginx container as:
 
-### 🔧 NGINX
+```text
+/etc/letsencrypt
+```
 
-| Variable                   | Description                                                                                                               | Exemple  |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------- | -------- |
-| `NGINX_TAG`                | Tag de l’image Docker Nginx utilisée. `latest` correspond à la dernière version disponible.                               | `latest` |
-| `NGINX_RESTART_POLICY`     | Politique de redémarrage du conteneur Docker. `always` redémarre automatiquement le conteneur en cas d’arrêt ou de crash. | `always` |
-| `NGINX_WORKER_PROCESSES`   | Nombre de processus workers Nginx. `auto` ajuste automatiquement selon le nombre de CPU disponibles.                      | `auto`   |
-| `NGINX_WORKER_CONNECTIONS` | Nombre maximal de connexions simultanées par worker. Impacte les performances et la capacité de charge.                   | `768`    |
+This follows the standard Certbot directory structure and makes certificate management easier to migrate or reuse.
 
-### 🚨 ERROR-PAGES
+For complete certificate management instructions, see the NGX Ops documentation.
 
-| Variable                     | Description                                               | Exemple      |
-| ---------------------------- | --------------------------------------------------------- | ------------ |
-| `ERROR_PAGES_TAG`            | Tag de l’image Docker des pages d’erreur.                 | `latest`     |
-| `ERROR_PAGES_RESTART_POLICY` | Politique de redémarrage du conteneur des pages d’erreur. | `always`     |
-| `ERROR_PAGES_TEMPLATE`       | Modèle de pages d’erreur utilisé (design / thème).        | `connection` |
+## 🧩 Nginx configuration
 
-### 🌍 GEOIPUPDATE
+Nginx configuration files are stored directly on the host.
 
-| Variable                     | Description                                                                                          | Exemple                          |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------- |
-| `GEOIPUPDATE_TAG`            | Tag de l’image Docker utilisée pour GeoIP Update.                                                    | `latest`                         |
-| `GEOIPUPDATE_RESTART_POLICY` | Politique de redémarrage du conteneur GeoIP Update.                                                  | `always`                         |
-| `GEOIPUPDATE_ACCOUNT_ID`     | Identifiant de compte MaxMind requis pour télécharger les bases GeoLite.                             | `000000`                         |
-| `GEOIPUPDATE_LICENSE_KEY`    | Clé de licence MaxMind associée au compte. **Doit rester confidentielle.**                           | `AbCdEfGh`                       |
-| `GEOIPUPDATE_EDITION_IDS`    | Bases GeoIP téléchargées (ville, pays, etc.). Plusieurs valeurs possibles, séparées par des espaces. | `GeoLite2-City GeoLite2-Country` |
-| `GEOIPUPDATE_FREQUENCY`      | Fréquence de mise à jour des bases GeoIP, en heures.                                                 | `168` (7 jours)                  |
+```text
+nginx/config/
+├── conf.d/
+├── sites/
+├── snippets/
+└── streams/
+```
 
-### CERTBOT
+This allows you to edit the configuration using your preferred editor, Git, or NGX Ops.
 
-| Variable                 | Description                                                                         | Exemple               |
-| ------------------------ | ----------------------------------------------------------------------------------- | --------------------- |
-| `CERTBOT_TAG`            | Tag de l’image Docker Certbot utilisée.                                             | `latest`              |
-| `CERTBOT_RESTART_POLICY` | Politique de redémarrage du conteneur Certbot.                                      | `always`              |
-| `CERTBOT_EMAIL`          | Adresse e-mail utilisée par Let’s Encrypt pour les alertes (expiration, problèmes). | `monemail@domain.tld` |
+For example:
 
+```text
+nginx/config/sites/example.com.conf
+```
 
-## Quelques commandes
+```nginx
+server {
+    listen 80;
+    server_name example.com;
 
-Il est possible de modifier les fichiers de configuration et virtualhost sans avoir besoin de redémarrer le conteneur Nginx.
+    location / {
+        proxy_pass http://192.168.1.10:8080;
+    }
+}
+```
 
-- Tester la configuration : `docker compose exec nginx nginx -t`
-- Recharger la configuration : `docker compose exec nginx nginx -s reload`
+After modifying the configuration, Nginx can be tested and reloaded through NGX Ops.
 
-## Chanlog
+## 🐳 Docker network
 
-### 14/05/2026
+The stack creates the following Docker network:
 
-- Passage version 1.30.x
-- Registre par défaut pour l'image : https://forge.rdr-it.com/Dockerfiles/-/packages/container/nginx-reverse-proxy/
+```text
+nginx-net
+```
 
-### 06/05/2026
+Applications that need to be published through Nginx can be connected to this network.
 
-- Nouvelle image basée sur l'image officiel nginx trixie
-- Passage en version 1.29.8
-- Arret du support du tag latest
-- Ajout dans l'image du nginx du module VTS
-- Suite au passage à Nginx 1.29.8, le snippet de logging a été modifié car nginx ne supporte plus les variables ($host) dans les chemins
+For example:
+
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    networks:
+      - nginx-net
+
+networks:
+  nginx-net:
+    external: true
+```
+
+This allows Nginx to communicate directly with the application container using its Docker service name.
+
+NGX Ops can also use this network for its Docker auto-configuration features.
+
+## 🤖 Docker auto-configuration
+
+NGX Ops supports automatic publication of Docker containers through Docker labels.
+
+Example:
+
+```yaml
+labels:
+  - "nginx-control.enable=true"
+  - "nginx-control.vhost.server_name=app.example.com"
+  - "nginx-control.vhost.location01=/"
+  - "nginx-control.vhost.location01.proxy_pass=http://web:80"
+  - "nginx-control.network=nginx-net"
+```
+
+The container can then be detected by NGX Ops and published through an automatically generated Nginx Virtual Host.
+
+See the NGX Ops documentation for the complete label reference and remote Docker agent configuration.
+
+## 📊 Monitoring and logs
+
+The stack provides the directories required by NGX Ops for monitoring and analysis:
+
+```text
+nginx/logs/
+nginx/cache/
+geoip_data/
+config/nginx-dashboard/goaccess/
+```
+
+These are used by features such as:
+
+* Real-time Nginx logs
+* Nginx Analyzer
+* GoAccess
+* GeoIP analysis
+* Cache management
+* Backend monitoring
+
+## 💾 Backups
+
+NGX Ops can create local configuration backups.
+
+They are stored in:
+
+```text
+backups/
+```
+
+The directory is mounted into NGX Ops as:
+
+```text
+/nginx/backups
+```
+
+This allows configuration backups to remain available independently of the container lifecycle.
+
+## 🔄 GitOps
+
+NGX Ops can use a Git repository as the source of truth for Nginx configuration.
+
+The following configuration directories can be managed through Git:
+
+```text
+nginx/config/conf.d/
+nginx/config/sites/
+nginx/config/snippets/
+nginx/config/streams/
+certificats/ssl/
+```
+
+This allows you to version:
+
+* Virtual Hosts
+* Nginx global configuration
+* Snippets
+* Stream configurations
+* SSL certificates
+
+and deploy validated configurations through NGX Ops.
+
+See the documentation for the complete GitOps configuration.
+
+## 🔧 Updating the stack
+
+To update the stack, modify the image versions in `.env`.
+
+For example:
+
+```dotenv
+NGINX_TAG=1.30.5
+NGX_OPS_DASHBOARD_TAG=x.x.x
+```
+
+Then recreate the containers:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+The configuration and data stored in the bind-mounted directories are preserved.
+
+## 📚 Documentation
+
+For complete information about NGX Ops and its features:
+
+**Documentation:**
+https://docs.ngx-ops.net/
+
+**Project website:**
+https://ngx-ops.net/
+
+## 🔗 Related projects
+
+### NGX Ops
+
+The dashboard used to manage and monitor this stack.
+
+https://forge.rdr-it.com/ngx-ops/ngx-ops
+
+### Nginx Reverse Proxy image
+
+The Nginx image used by this stack:
+
+https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy
+
+## 🇫🇷 Français
+
+# Stack Nginx Reverse Proxy
+
+Ce dépôt contient les fichiers Docker Compose permettant de déployer un **reverse proxy Nginx avec NGX Ops**.
+
+Le stack fournit une base complète pour déployer :
+
+* Nginx
+* NGX Ops
+* Certificats SSL
+* Let's Encrypt / Certbot
+* GeoIP
+* Logs Nginx
+* Cache Nginx
+* GoAccess
+* Nginx Analyzer
+* Sauvegardes locales
+* Gestion de configuration avec Git
+
+L'objectif est de disposer d'un **stack prêt à déployer**, tout en conservant une configuration Nginx classique et directement accessible sur le système de fichiers.
+
+## 🌐 Projet
+
+* **Site NGX Ops :** https://ngx-ops.net/
+* **Documentation :** https://docs.ngx-ops.net/
+* **Code source NGX Ops :** https://forge.rdr-it.com/ngx-ops/ngx-ops
+* **Dépôt de déploiement :** https://forge.rdr-it.com/ngx-ops/compose
+
+## 🏗️ Architecture
+
+Le stack repose principalement sur deux conteneurs :
+
+```text
+                         Internet / LAN
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │        Nginx        │
+                    │   Reverse Proxy     │
+                    │                     │
+                    │  HTTP / HTTPS       │
+                    │  VHosts             │
+                    │  SSL               │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    │                     │
+                    ▼                     ▼
+              Applications          NGX Ops
+                                    Dashboard / API
+                                         │
+                 ┌───────────────────────┼──────────────────────┐
+                 │                       │                      │
+                 ▼                       ▼                      ▼
+              Docker                  GitOps                GoAccess
+              Socket                 Configuration           Analyzer
+```
+
+Nginx et NGX Ops sont connectés au réseau Docker `nginx-net`.
+
+NGX Ops dispose également d'un accès au socket Docker afin de pouvoir effectuer les opérations liées au conteneur Nginx et aux fonctionnalités d'auto-configuration Docker.
+
+## 📂 Arborescence
+
+Les données du stack sont stockées à l'aide de bind mounts afin de rester directement accessibles sur l'hôte.
+
+```text
+ngx-ops/
+├── compose.yml
+├── sample.env
+├── nginx-dashboard.env
+│
+├── nginx/
+│   ├── config/
+│   │   ├── conf.d/
+│   │   ├── sites/
+│   │   ├── snippets/
+│   │   └── streams/
+│   ├── webroot/
+│   ├── logs/
+│   └── cache/
+│
+├── certificats/
+│   ├── ssl/
+│   └── certbot/
+│
+├── geoip_data/
+│
+├── config/
+│   └── nginx-dashboard/
+│       ├── config/
+│       └── goaccess/
+│
+└── backups/
+```
+
+## 🚀 Déploiement
+
+### Prérequis
+
+Vous devez disposer de :
+
+* Docker
+* Docker Compose
+* Un serveur Linux
+* Des ports `80` et `443` disponibles
+
+Créez le dossier de déploiement :
+
+```bash
+mkdir -p /containers/ngx-ops
+cd /containers/ngx-ops
+bash <(wget -qO- https://forge.rdr-it.com/ngx-ops/compose/raw/branch/main/deploy.sh) ngx-ops
+```
+
+### Configuration
+
+Copiez le fichier d'exemple :
+
+```bash
+cp sample.env .env
+```
+
+Puis adaptez les valeurs à votre environnement.
+
+Les principaux paramètres sont :
+
+```dotenv
+RESTART_POLICY=always
+NGINX_NETWORK=nginx-net
+
+NGINX_TAG=1.30.5
+NGINX_CONTAINER_NAME=nginx
+NGINX_WORKER_PROCESSES=auto
+NGINX_WORKER_CONNECTIONS=768
+
+NGX_DHB_CONTAINER_NAME=nginx-dashboard
+```
+
+Les versions des images Nginx et NGX Ops peuvent être modifiées depuis le fichier `.env`.
+
+Publier directement le NGX Ops sur le port 3000, renommer le fichier compose.override.yml.sample en compose.override.yml.
+
+## ▶️ Démarrer le 
+
+Démarrer le stack sans le parametre -d pour voir le mot de passe admin qui sera visible seulement au premier demarrage.
+
+```bash
+docker compose up
+```
+
+Depuis un navigateur, aller à l'adresse http://ip:3000
+
+## ⚙️ Personnaliser le déploiement
+
+Le fichier `compose.yml` doit rester autant que possible proche de la configuration du stack.
+
+Pour vos personnalisations locales, utilisez :
+
+```text
+compose.override.yml
+```
+
+Par exemple :
+
+```yaml
+services:
+  nginx-dashboard:
+    ports:
+      - "3000:3000"
+```
+
+Puis :
+
+```bash
+docker compose up -d
+```
+
+Docker Compose fusionnera automatiquement `compose.yml` et `compose.override.yml`.
+
+Cela permet de personnaliser notamment :
+
+* les ports ;
+* les volumes ;
+* les réseaux ;
+* les variables d'environnement ;
+* les limites de ressources ;
+* les services supplémentaires.
+
+## 🔐 Certificats SSL
+
+Les certificats sont organisés dans :
+
+```text
+certificats/
+├── ssl/
+└── certbot/
+```
+
+Les certificats manuels sont disponibles dans Nginx sous :
+
+```text
+/ssl
+```
+
+Les données Certbot sont disponibles sous :
+
+```text
+/etc/letsencrypt
+```
+
+Cette organisation permet notamment de conserver une structure compatible avec les outils Nginx et Certbot classiques.
+
+## 🧩 Configuration Nginx
+
+La configuration est directement disponible sur l'hôte :
+
+```text
+nginx/config/
+├── conf.d/
+├── sites/
+├── snippets/
+└── streams/
+```
+
+Vous pouvez donc modifier les fichiers avec votre éditeur habituel, les gérer avec Git ou utiliser NGX Ops.
+
+## 🐳 Réseau Docker
+
+Le stack crée le réseau :
+
+```text
+nginx-net
+```
+
+Les applications devant être publiées par Nginx peuvent être connectées à ce réseau :
+
+```yaml
+services:
+  web:
+    image: nginx:alpine
+    networks:
+      - nginx-net
+
+networks:
+  nginx-net:
+    external: true
+```
+
+Nginx peut alors communiquer directement avec le conteneur à travers son nom Docker.
+
+Ce réseau est également utilisé par les fonctionnalités d'auto-configuration Docker de NGX Ops.
+
+## 🤖 Auto-configuration Docker
+
+NGX Ops permet de publier automatiquement les conteneurs Docker grâce aux labels.
+
+Exemple :
+
+```yaml
+labels:
+  - "nginx-control.enable=true"
+  - "nginx-control.vhost.server_name=app.example.com"
+  - "nginx-control.vhost.location01=/"
+  - "nginx-control.vhost.location01.proxy_pass=http://web:80"
+  - "nginx-control.network=nginx-net"
+```
+
+NGX Ops détecte alors le conteneur et peut générer automatiquement le Virtual Host Nginx correspondant.
+
+La documentation NGX Ops détaille les labels disponibles ainsi que la publication de conteneurs sur des hôtes Docker distants.
+
+## 📊 Supervision et logs
+
+Les répertoires nécessaires aux fonctionnalités de supervision et d'analyse sont persistants :
+
+```text
+nginx/logs/
+nginx/cache/
+geoip_data/
+config/nginx-dashboard/goaccess/
+```
+
+Ils sont utilisés notamment pour :
+
+* les logs Nginx en temps réel ;
+* Nginx Analyzer ;
+* GoAccess ;
+* l'analyse GeoIP ;
+* la gestion du cache ;
+* la supervision des backends.
+
+## 💾 Sauvegardes
+
+Les sauvegardes locales de configuration sont stockées dans :
+
+```text
+backups/
+```
+
+Elles sont accessibles depuis NGX Ops sous :
+
+```text
+/nginx/backups
+```
+
+Les sauvegardes restent donc disponibles indépendamment du cycle de vie du conteneur.
+
+## 🔄 GitOps
+
+NGX Ops peut utiliser un dépôt Git comme **source de vérité** pour la configuration Nginx.
+
+Les répertoires suivants peuvent notamment être versionnés :
+
+```text
+nginx/config/conf.d/
+nginx/config/sites/
+nginx/config/snippets/
+nginx/config/streams/
+certificats/ssl/
+```
+
+Cela permet de conserver l'historique des modifications et de déployer une configuration validée depuis NGX Ops.
+
+## 🔧 Mise à jour
+
+Les versions des images peuvent être modifiées dans `.env`.
+
+Par exemple :
+
+```dotenv
+NGINX_TAG=1.30.5
+NGX_DHB_TAG=x.x.x
+```
+
+Puis :
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Les configurations et données présentes dans les répertoires montés restent conservées.
+
+## 📚 Documentation
+
+Pour découvrir toutes les fonctionnalités de NGX Ops :
+
+**Documentation :**
+https://docs.ngx-ops.net/
+
+**Site du projet :**
+https://ngx-ops.net/
+
+## 🔗 Projets associés
+
+### NGX Ops
+
+Dashboard permettant de gérer et superviser ce stack :
+
+https://forge.rdr-it.com/ngx-ops/ngx-ops
+
+### Nginx Reverse Proxy
+
+Image Nginx utilisée par ce stack :
+
+https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy

@@ -1,11 +1,11 @@
 # Nginx Reverse Proxy Stack
 
-Docker Compose stack for deploying an **Nginx reverse proxy with Nginx Control**.
+Docker Compose stack for deploying an **Nginx reverse proxy with NGX Ops**.
 
 This repository contains the files required to deploy a complete Nginx reverse proxy environment, including:
 
 * Nginx
-* Nginx Control
+* NGX Ops
 * SSL certificates
 * Let's Encrypt / Certbot
 * GeoIP data
@@ -15,14 +15,14 @@ This repository contains the files required to deploy a complete Nginx reverse p
 * Local configuration backups
 * Git-based configuration management
 
-The stack is designed to work with **Nginx Control** and keeps the standard Nginx configuration structure.
+The stack is designed to work with **NGX Ops** and keeps the standard Nginx configuration structure.
 
 ## 🌐 Project
 
-* **Nginx Control website:** https://nginx-control.rdr-it.com
-* **Nginx Control documentation:** https://docs.nginx-control.rdr-it.com/
-* **Nginx Control source code:** https://forge.rdr-it.com/Nginx/nginx-control
-* **This deployment repository:** https://forge.rdr-it.com/romain/Docker-Compose/src/branch/main/ReverseProxy
+* **NGX Ops website:** https://ngx-ops.net
+* **NGX Ops documentation:** https://docs.ngx-ops.net
+* **NGX Ops source code:** https://forge.rdr-it.com/ngx-ops/ngx-ops
+* **This deployment repository:** https://forge.rdr-it.com/ngx-ops/compose
 
 ## 🏗️ Architecture
 
@@ -44,7 +44,7 @@ The stack is composed of two main containers:
                     ┌──────────┴──────────┐
                     │                     │
                     ▼                     ▼
-              Applications          Nginx Control
+              Applications          NGX Ops
                                     Dashboard / API
                                          │
                  ┌───────────────────────┼──────────────────────┐
@@ -54,19 +54,19 @@ The stack is composed of two main containers:
               Socket                 Configuration           Analyzer
 ```
 
-Both Nginx and Nginx Control are connected to the `nginx-net` Docker network.
+Both Nginx and NGX Ops are connected to the `nginx-net` Docker network.
 
-Nginx Control also has access to the Docker socket in order to provide Docker-related features and Nginx container control.
+NGX Ops also has access to the Docker socket in order to provide Docker-related features and Nginx container control.
 
 ## 📂 Directory structure
 
 The stack uses bind mounts so that the configuration and data remain directly accessible on the host.
 
 ```text
-ReverseProxy/
+ngx-ops/
 ├── compose.yml
 ├── sample.env
-├── nginx-dashboard.env
+├── ngx-ops.env
 │
 ├── nginx/
 │   ├── config/
@@ -92,7 +92,7 @@ ReverseProxy/
 └── backups/
 ```
 
-The configuration structure follows the standard organization used by Nginx Control:
+The configuration structure follows the standard organization used by NGX Ops:
 
 * `nginx/config/conf.d/` — global HTTP configuration
 * `nginx/config/sites/` — virtual hosts
@@ -103,7 +103,7 @@ The configuration structure follows the standard organization used by Nginx Cont
 * `certificats/ssl/` — manually managed SSL certificates
 * `certificats/certbot/` — Let's Encrypt / Certbot data
 * `geoip_data/` — GeoIP databases
-* `config/nginx-dashboard/` — Nginx Control configuration and GoAccess data
+* `config/nginx-dashboard/` — NGX Ops configuration and GoAccess data
 * `backups/` — local configuration backups
 
 ## 🚀 Deployment
@@ -122,8 +122,9 @@ Clone or copy this directory to your server.
 For example:
 
 ```bash
-mkdir -p /containers/reverse-proxy
-cd /containers/reverse-proxy
+mkdir -p /containers/ngx-ops
+cd /containers/ngx-ops
+bash <(wget -qO- https://forge.rdr-it.com/ngx-ops/compose/raw/branch/main/deploy.sh) ngx-ops
 ```
 
 ### Configure the environment
@@ -147,38 +148,28 @@ NGINX_CONTAINER_NAME=nginx
 NGINX_WORKER_PROCESSES=auto
 NGINX_WORKER_CONNECTIONS=768
 
-NGX_DHB_CONTAINER_NAME=nginx-dashboard
+NGX_DHB_CONTAINER_NAME=ngx-ops-dashboard
 ```
 
-The stack uses version tags for both the Nginx image and the Nginx Control image, which can be overridden through the `.env` file.
+Rename `compose.override.yml.sample` to `compose.override.yml` for direct expose NGX Ops Dashboard on port 3000
+
+```bash
+
+The stack uses version tags for both the Nginx image and the NGX Ops image, which can be overridden through the `.env` file.
 
 ## ▶️ Start the stack
 
-Start the stack with:
+Start the stack without the -d parameter to see the admin account password, which will be visible upon initial startup :
 
 ```bash
-docker compose up -d
+docker compose up
 ```
 
-Check the containers:
-
-```bash
-docker compose ps
-```
-
-View the logs:
-
-```bash
-docker compose logs -f
-```
+Copy the admin account password and press the 'd' key to detach the session.
 
 Nginx automatically validates its configuration when starting.
 
-If the configuration is invalid, check the Nginx container logs:
-
-```bash
-docker compose logs nginx
-```
+Go to http://ip:3000 in a web browser to access the dashboard.
 
 ## ⚙️ Customizing the deployment
 
@@ -192,7 +183,7 @@ Create:
 compose.override.yml
 ```
 
-For example, to publish Nginx Control directly on a local port:
+For example, to publish NGX Ops directly on a local port:
 
 ```yaml
 services:
@@ -276,7 +267,7 @@ and mounted inside the Nginx container as:
 
 This follows the standard Certbot directory structure and makes certificate management easier to migrate or reuse.
 
-For complete certificate management instructions, see the Nginx Control documentation.
+For complete certificate management instructions, see the NGX Ops documentation.
 
 ## 🧩 Nginx configuration
 
@@ -290,7 +281,7 @@ nginx/config/
 └── streams/
 ```
 
-This allows you to edit the configuration using your preferred editor, Git, or Nginx Control.
+This allows you to edit the configuration using your preferred editor, Git, or NGX Ops.
 
 For example:
 
@@ -309,7 +300,7 @@ server {
 }
 ```
 
-After modifying the configuration, Nginx can be tested and reloaded through Nginx Control.
+After modifying the configuration, Nginx can be tested and reloaded through NGX Ops.
 
 ## 🐳 Docker network
 
@@ -337,11 +328,11 @@ networks:
 
 This allows Nginx to communicate directly with the application container using its Docker service name.
 
-Nginx Control can also use this network for its Docker auto-configuration features.
+NGX Ops can also use this network for its Docker auto-configuration features.
 
 ## 🤖 Docker auto-configuration
 
-Nginx Control supports automatic publication of Docker containers through Docker labels.
+NGX Ops supports automatic publication of Docker containers through Docker labels.
 
 Example:
 
@@ -354,13 +345,13 @@ labels:
   - "nginx-control.network=nginx-net"
 ```
 
-The container can then be detected by Nginx Control and published through an automatically generated Nginx Virtual Host.
+The container can then be detected by NGX Ops and published through an automatically generated Nginx Virtual Host.
 
-See the Nginx Control documentation for the complete label reference and remote Docker agent configuration.
+See the NGX Ops documentation for the complete label reference and remote Docker agent configuration.
 
 ## 📊 Monitoring and logs
 
-The stack provides the directories required by Nginx Control for monitoring and analysis:
+The stack provides the directories required by NGX Ops for monitoring and analysis:
 
 ```text
 nginx/logs/
@@ -380,7 +371,7 @@ These are used by features such as:
 
 ## 💾 Backups
 
-Nginx Control can create local configuration backups.
+NGX Ops can create local configuration backups.
 
 They are stored in:
 
@@ -388,7 +379,7 @@ They are stored in:
 backups/
 ```
 
-The directory is mounted into Nginx Control as:
+The directory is mounted into NGX Ops as:
 
 ```text
 /nginx/backups
@@ -398,7 +389,7 @@ This allows configuration backups to remain available independently of the conta
 
 ## 🔄 GitOps
 
-Nginx Control can use a Git repository as the source of truth for Nginx configuration.
+NGX Ops can use a Git repository as the source of truth for Nginx configuration.
 
 The following configuration directories can be managed through Git:
 
@@ -418,7 +409,7 @@ This allows you to version:
 * Stream configurations
 * SSL certificates
 
-and deploy validated configurations through Nginx Control.
+and deploy validated configurations through NGX Ops.
 
 See the documentation for the complete GitOps configuration.
 
@@ -430,7 +421,7 @@ For example:
 
 ```dotenv
 NGINX_TAG=1.30.5
-NGX_DHB_TAG=x.x.x
+NGX_OPS_DASHBOARD_TAG=x.x.x
 ```
 
 Then recreate the containers:
@@ -444,21 +435,21 @@ The configuration and data stored in the bind-mounted directories are preserved.
 
 ## 📚 Documentation
 
-For complete information about Nginx Control and its features:
+For complete information about NGX Ops and its features:
 
 **Documentation:**
-https://docs.nginx-control.rdr-it.com/
+https://docs.ngx-ops.net/
 
 **Project website:**
-https://nginx-control.rdr-it.com
+https://ngx-ops.net/
 
 ## 🔗 Related projects
 
-### Nginx Control
+### NGX Ops
 
 The dashboard used to manage and monitor this stack.
 
-https://forge.rdr-it.com/Nginx/nginx-control
+https://forge.rdr-it.com/ngx-ops/ngx-ops
 
 ### Nginx Reverse Proxy image
 
@@ -470,12 +461,12 @@ https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy
 
 # Stack Nginx Reverse Proxy
 
-Ce dépôt contient les fichiers Docker Compose permettant de déployer un **reverse proxy Nginx avec Nginx Control**.
+Ce dépôt contient les fichiers Docker Compose permettant de déployer un **reverse proxy Nginx avec NGX Ops**.
 
 Le stack fournit une base complète pour déployer :
 
 * Nginx
-* Nginx Control
+* NGX Ops
 * Certificats SSL
 * Let's Encrypt / Certbot
 * GeoIP
@@ -490,10 +481,10 @@ L'objectif est de disposer d'un **stack prêt à déployer**, tout en conservant
 
 ## 🌐 Projet
 
-* **Site Nginx Control :** https://nginx-control.rdr-it.com
-* **Documentation :** https://docs.nginx-control.rdr-it.com/
-* **Code source Nginx Control :** https://forge.rdr-it.com/Nginx/nginx-control
-* **Dépôt de déploiement :** https://forge.rdr-it.com/romain/Docker-Compose/src/branch/main/ReverseProxy
+* **Site NGX Ops :** https://ngx-ops.net/
+* **Documentation :** https://docs.ngx-ops.net/
+* **Code source NGX Ops :** https://forge.rdr-it.com/ngx-ops/ngx-ops
+* **Dépôt de déploiement :** https://forge.rdr-it.com/ngx-ops/compose
 
 ## 🏗️ Architecture
 
@@ -515,7 +506,7 @@ Le stack repose principalement sur deux conteneurs :
                     ┌──────────┴──────────┐
                     │                     │
                     ▼                     ▼
-              Applications          Nginx Control
+              Applications          NGX Ops
                                     Dashboard / API
                                          │
                  ┌───────────────────────┼──────────────────────┐
@@ -525,16 +516,16 @@ Le stack repose principalement sur deux conteneurs :
               Socket                 Configuration           Analyzer
 ```
 
-Nginx et Nginx Control sont connectés au réseau Docker `nginx-net`.
+Nginx et NGX Ops sont connectés au réseau Docker `nginx-net`.
 
-Nginx Control dispose également d'un accès au socket Docker afin de pouvoir effectuer les opérations liées au conteneur Nginx et aux fonctionnalités d'auto-configuration Docker.
+NGX Ops dispose également d'un accès au socket Docker afin de pouvoir effectuer les opérations liées au conteneur Nginx et aux fonctionnalités d'auto-configuration Docker.
 
 ## 📂 Arborescence
 
 Les données du stack sont stockées à l'aide de bind mounts afin de rester directement accessibles sur l'hôte.
 
 ```text
-ReverseProxy/
+ngx-ops/
 ├── compose.yml
 ├── sample.env
 ├── nginx-dashboard.env
@@ -577,8 +568,9 @@ Vous devez disposer de :
 Créez le dossier de déploiement :
 
 ```bash
-mkdir -p /containers/reverse-proxy
-cd /containers/reverse-proxy
+mkdir -p /containers/ngx-ops
+cd /containers/ngx-ops
+bash <(wget -qO- https://forge.rdr-it.com/ngx-ops/compose/raw/branch/main/deploy.sh) ngx-ops
 ```
 
 ### Configuration
@@ -605,33 +597,19 @@ NGINX_WORKER_CONNECTIONS=768
 NGX_DHB_CONTAINER_NAME=nginx-dashboard
 ```
 
-Les versions des images Nginx et Nginx Control peuvent être modifiées depuis le fichier `.env`.
+Les versions des images Nginx et NGX Ops peuvent être modifiées depuis le fichier `.env`.
 
-## ▶️ Démarrer le stack
+Publier directement le NGX Ops sur le port 3000, renommer le fichier compose.override.yml.sample en compose.override.yml.
 
-```bash
-docker compose up -d
-```
+## ▶️ Démarrer le 
 
-Vérifiez l'état des conteneurs :
+Démarrer le stack sans le parametre -d pour voir le mot de passe admin qui sera visible seulement au premier demarrage.
 
 ```bash
-docker compose ps
+docker compose up
 ```
 
-Pour consulter les logs :
-
-```bash
-docker compose logs -f
-```
-
-La configuration Nginx est automatiquement vérifiée au démarrage.
-
-En cas d'erreur :
-
-```bash
-docker compose logs nginx
-```
+Depuis un navigateur, aller à l'adresse http://ip:3000
 
 ## ⚙️ Personnaliser le déploiement
 
@@ -705,7 +683,7 @@ nginx/config/
 └── streams/
 ```
 
-Vous pouvez donc modifier les fichiers avec votre éditeur habituel, les gérer avec Git ou utiliser Nginx Control.
+Vous pouvez donc modifier les fichiers avec votre éditeur habituel, les gérer avec Git ou utiliser NGX Ops.
 
 ## 🐳 Réseau Docker
 
@@ -731,11 +709,11 @@ networks:
 
 Nginx peut alors communiquer directement avec le conteneur à travers son nom Docker.
 
-Ce réseau est également utilisé par les fonctionnalités d'auto-configuration Docker de Nginx Control.
+Ce réseau est également utilisé par les fonctionnalités d'auto-configuration Docker de NGX Ops.
 
 ## 🤖 Auto-configuration Docker
 
-Nginx Control permet de publier automatiquement les conteneurs Docker grâce aux labels.
+NGX Ops permet de publier automatiquement les conteneurs Docker grâce aux labels.
 
 Exemple :
 
@@ -748,9 +726,9 @@ labels:
   - "nginx-control.network=nginx-net"
 ```
 
-Nginx Control détecte alors le conteneur et peut générer automatiquement le Virtual Host Nginx correspondant.
+NGX Ops détecte alors le conteneur et peut générer automatiquement le Virtual Host Nginx correspondant.
 
-La documentation Nginx Control détaille les labels disponibles ainsi que la publication de conteneurs sur des hôtes Docker distants.
+La documentation NGX Ops détaille les labels disponibles ainsi que la publication de conteneurs sur des hôtes Docker distants.
 
 ## 📊 Supervision et logs
 
@@ -780,7 +758,7 @@ Les sauvegardes locales de configuration sont stockées dans :
 backups/
 ```
 
-Elles sont accessibles depuis Nginx Control sous :
+Elles sont accessibles depuis NGX Ops sous :
 
 ```text
 /nginx/backups
@@ -790,7 +768,7 @@ Les sauvegardes restent donc disponibles indépendamment du cycle de vie du cont
 
 ## 🔄 GitOps
 
-Nginx Control peut utiliser un dépôt Git comme **source de vérité** pour la configuration Nginx.
+NGX Ops peut utiliser un dépôt Git comme **source de vérité** pour la configuration Nginx.
 
 Les répertoires suivants peuvent notamment être versionnés :
 
@@ -802,7 +780,7 @@ nginx/config/streams/
 certificats/ssl/
 ```
 
-Cela permet de conserver l'historique des modifications et de déployer une configuration validée depuis Nginx Control.
+Cela permet de conserver l'historique des modifications et de déployer une configuration validée depuis NGX Ops.
 
 ## 🔧 Mise à jour
 
@@ -826,21 +804,21 @@ Les configurations et données présentes dans les répertoires montés restent 
 
 ## 📚 Documentation
 
-Pour découvrir toutes les fonctionnalités de Nginx Control :
+Pour découvrir toutes les fonctionnalités de NGX Ops :
 
 **Documentation :**
-https://docs.nginx-control.rdr-it.com/
+https://docs.ngx-ops.net/
 
 **Site du projet :**
-https://nginx-control.rdr-it.com
+https://ngx-ops.net/
 
 ## 🔗 Projets associés
 
-### Nginx Control
+### NGX Ops
 
 Dashboard permettant de gérer et superviser ce stack :
 
-https://forge.rdr-it.com/Nginx/nginx-control
+https://forge.rdr-it.com/ngx-ops/ngx-ops
 
 ### Nginx Reverse Proxy
 

@@ -1,1 +1,0 @@
-Get sample here : https://forge.rdr-it.com/Dockerfiles/nginx-reverse-proxy-dashboard/src/branch/main/nginx-dashboard/config
