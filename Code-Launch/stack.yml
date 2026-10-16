@@ -52,13 +52,32 @@ vars:
     required: true
   ADMIN_SESSION_SECRET:
     type: text 
-    label: Chaîne aléatoire (32 caractères minimum). Sert à signer les sessions et à chiffrer les mots de passe permanents des espaces et les secrets enregistrés. Le changer rend illisibles les mots de passe permanents et secrets déjà enregistrés.
+    label: Sert à signer les sessions et à chiffrer les mots de passe permanents des espaces et les secrets enregistrés.
+    description: Chaîne aléatoire (32 caractères minimum). Sert à signer les sessions et à chiffrer les mots de passe permanents des espaces et les secrets enregistrés. Le changer rend illisibles les mots de passe permanents et secrets déjà enregistrés.
     required: true
     gen: openssl-rand-hex-32
+  # Brand
+  BRAND_NAME:
+    type: text
+    label: Nom affiché dans les pages et les emails
+    default: CodeLaunch 
+  BRAND_LOGO_URL:
+    type: url 
+    label: URL d'une image de logo (vide = icône ⚡ par défaut)
   # Config
   APP_PORT:
     type: port 
+    label: Port interne de l'application
+    description: Port interne de l'application. Laisser 3000 : le compose (label Traefik, healthcheck) et FORWARD_AUTH_URL supposent 3000
     default: 3000
+  NODE_ENV:
+    type: text 
+    default: production
+    label: 	production active le cookie de session Secure (HTTPS obligatoire) et désactive CORS ouvert. Ne pas mettre autre chose en production
+  TZ:
+    type: text
+    default: Europe/Paris
+    label: 	Fuseau horaire passé aux espaces code-server (et à l'application)
 
 
   
