@@ -39,6 +39,27 @@ vars:
     label: Chemin absolue sur l'hôte de Docker où les fichiers de mot de passe d'accès VSCode sont stockés 
     required: true
     placeholder: /var/lib/code-server
+  # ADMIN
+  ADMIN_USERNAME:
+    type: text
+    label: identifiant du compte administrateur par défaut
+    required: true
+    default: admin 
+    placeholder: admin 
+  ADMIN_PASSWORD:
+    type: secret
+    label: Mot de passe du compte admin, une fois le SSO en place peut etre désactiver avec ADMIN_LOCAL_LOGIN=false
+    required: true
+  ADMIN_SESSION_SECRET:
+    type: text 
+    label: Chaîne aléatoire (32 caractères minimum). Sert à signer les sessions et à chiffrer les mots de passe permanents des espaces et les secrets enregistrés. Le changer rend illisibles les mots de passe permanents et secrets déjà enregistrés.
+    required: true
+    gen: openssl-rand-hex-32
+  # Config
+  APP_PORT:
+    type: port 
+    default: 3000
+
 
   
   
