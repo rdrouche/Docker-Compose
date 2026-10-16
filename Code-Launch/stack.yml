@@ -1,9 +1,11 @@
 app:
   name: Code Launch
-  description: Lanceur d'espace VSCode à la demande
+  description: Lanceur d'espace VSCode à la demande, Traefik est requis pour la publication automatique des espace VSCode et un serveur SMTP est requis si utilisation des "Magic Link" pour la connexion utilisateur
   tags:
     - vscode
     - sso
+    - traefik
+    - openid
 
 vars:
   APP_PUBLIC_URL:
@@ -22,5 +24,21 @@ vars:
     label: Domaine de publication des espaces VSCode
     required: true 
     placeholder: codes.domain.tld
+  DOCKER_NETWORK:
+    type: text
+    label: Nom du reseau Traefik pour attache les espaces VSCode
+    required: true
+    placeholder: traefik
+  CODE_SERVER_DATA_PATH:
+    type: path 
+    label: Chemin absolue sur l'hôte de Docker où les données des espaces VScode est stockés (données utilisateurs)
+    required: true
+    placeholder: /containers/codelaunch/vscode_data
+  CODE_SERVER_PASSWD_PATH:
+    type: path
+    label: Chemin absolue sur l'hôte de Docker où les fichiers de mot de passe d'accès VSCode sont stockés 
+    required: true
+    placeholder: /var/lib/code-server
+
   
   
