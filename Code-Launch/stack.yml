@@ -1,0 +1,26 @@
+app:
+  name: Code Launch
+  description: Lanceur d'espace VSCode à la demande
+  tags:
+    - vscode
+    - sso
+
+vars:
+  APP_PUBLIC_URL:
+    type: url
+    label: URL interface administration et espace utilisateur
+    description: URL interface Administration et espace utilisateur, exemple https://code.domain.tld (Cette url peut etre commune avec BASE_URI)
+    required: true
+    placeholder: https://codes.domain.tld
+  BASE_UI_DOMAIN:
+    type: domain
+    label: Domain de l'interface administration et espace utilisateur
+    required: true
+    placeholder: codes.domain.tld
+  BASE_URI:
+    type: domain 
+    label: Domaine de publication des espaces VSCode
+    required: true 
+    placeholder: codes.domain.tld
+  
+  
