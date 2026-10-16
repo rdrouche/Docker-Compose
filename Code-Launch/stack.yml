@@ -50,19 +50,29 @@ vars:
     type: secret
     label: Mot de passe du compte admin, une fois le SSO en place peut etre désactiver avec ADMIN_LOCAL_LOGIN=false
     required: true
+    gen: alpha-24
   ADMIN_SESSION_SECRET:
     type: text 
     label: Sert à signer les sessions et à chiffrer les mots de passe permanents des espaces et les secrets enregistrés.
     description: Chaîne aléatoire (32 caractères minimum). Sert à signer les sessions et à chiffrer les mots de passe permanents des espaces et les secrets enregistrés. Le changer rend illisibles les mots de passe permanents et secrets déjà enregistrés.
     required: true
     gen: openssl-rand-hex-32
+  # Branding
   BRAND_NAME:
     type: text
     label: Nom affiché dans les pages et les emails
-    default: CodeLaunch 
+    default: CodeLaunch
+    group: Branding
   BRAND_LOGO_URL:
     type: url 
     label: URL d'une image de logo (vide = icône ⚡ par défaut)
+    default:
+    group: Branding
+  BRAND_PRIMARY_COLOR:
+    type: text 
+    default: "#2ea8ff"
+    group: Branding 
+  # Config 
   APP_PORT:
     type: port 
     label: Port interne de l'application
