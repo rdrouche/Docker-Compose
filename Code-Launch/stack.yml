@@ -56,7 +56,6 @@ vars:
     description: Chaîne aléatoire (32 caractères minimum). Sert à signer les sessions et à chiffrer les mots de passe permanents des espaces et les secrets enregistrés. Le changer rend illisibles les mots de passe permanents et secrets déjà enregistrés.
     required: true
     gen: openssl-rand-hex-32
-  # Brand
   BRAND_NAME:
     type: text
     label: Nom affiché dans les pages et les emails
@@ -64,7 +63,6 @@ vars:
   BRAND_LOGO_URL:
     type: url 
     label: URL d'une image de logo (vide = icône ⚡ par défaut)
-  # Config
   APP_PORT:
     type: port 
     label: Port interne de l'application
