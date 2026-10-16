@@ -66,7 +66,7 @@ vars:
   BRAND_LOGO_URL:
     type: url 
     label: URL d'une image de logo (vide = icône ⚡ par défaut)
-    default:
+    #default:
     group: Branding
   BRAND_PRIMARY_COLOR:
     type: text 
