@@ -8,6 +8,14 @@ app:
     - openid
 
 vars:
+  BACKEND_TAG:
+    type: text
+    label: Tag de l'image CodeLaunch - https://forge.rdr-it.com/registry/-/packages/container/code-launch/
+    default: latest
+    placeholder: latest
+  RESTART_POLICY:
+    type: test
+    default: unless-stopped
   APP_PUBLIC_URL:
     type: url
     label: URL interface administration et espace utilisateur

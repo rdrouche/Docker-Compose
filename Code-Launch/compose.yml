@@ -1,3 +1,4 @@
+# https://rdr-it.com/docker-compose/#Code-Launch
 ---
 name: codelaunch
 
@@ -7,8 +8,7 @@ services:
     container_name: codelaunch-backend
     restart: ${RESTART_POLICY:-unless-stopped}
     environment:
-      NODE_ENV=production
-      DATA_DIR=/data
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./codelaunch-data:/data
@@ -24,14 +24,10 @@ services:
       traefik.http.routers.codelaunch.tls: "true"
       traefik.http.routers.codelaunch.entrypoints: "websecure"
       traefik.http.routers.codelaunch.service: "codelaunch"
-      traefik.http.services.codelaunch.loadbalancer.server.port: "3000"
-
-#volumes:
-#  codelaunch-data:
-#    name: codelaunch-data
+      traefik.http.services.codelaunch.loadbalancer.server.port: "${APP_PORT:-3000}"
 
 networks:
-  proxy:
+  ${DOCKER_NETWORK:-proxy}:
     external: true
     name: ${DOCKER_NETWORK:-proxy}
   codelaunch-internal:
