@@ -30,4 +30,5 @@ vars:
     type: path 
     required: true 
     default: /var/lib/postgresql/18/docker
+    group: Postgres
 
