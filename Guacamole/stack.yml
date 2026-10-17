@@ -42,10 +42,14 @@ vars:
     type: bool 
     default: true
     label: Active le module qui permet l enregistrement video des sessions
+    services:
+      - guacamole
   RECORDING_SEARCH_PATH:
     type: path 
     default: /record
     label: Emplacement a l interieure du conteneur où sont disponible les fichiers video
+    services:
+      - guacamole
   GUACD_PATH_DRIVE:
     type: path
     label: Emplacement sur hote pour le mappage du partage de fichier
