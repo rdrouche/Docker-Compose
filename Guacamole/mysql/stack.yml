@@ -1,0 +1,32 @@
+stack:
+  - title: Avec MySQL
+  - description: ""
+vars:
+  MYSQL_DATABASE:
+    type: text
+    required: true
+    default: guacamole
+    placeholder: guacamole
+    services:
+      - guacamole_db
+      - guacamole
+    group: mysql
+  MYSQL_USER:
+    type: text
+    required: true
+    default: guacamole
+    placeholder: guacamole
+    services:
+      - guacamole_db
+      - guacamole
+    group: mysql
+  MYSQL_PASSWORD:
+    type: secret
+    required: true
+    gen: alpha-24
+    default: guacamole
+    placeholder: guacamole
+    services: 
+      - guacamole_db
+      - guacamole
+    group: mysql

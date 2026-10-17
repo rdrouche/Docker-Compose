@@ -1,0 +1,7 @@
+app:
+  name: Apache Guacamole
+  description: Passerelle RDP / SSH / VNC dans le navigateur
+  tags: [accès distant, rdp, ssh]
+stacks:
+  mysql: MySQL
+  postgres: PostgreSQL 
