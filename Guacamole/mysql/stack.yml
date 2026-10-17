@@ -6,7 +6,7 @@ vars:
     type: text
     default: 11
     services:
-      - guacamole_db
+      - db
     group:
       - mysql
   MYSQL_DATABASE:
@@ -15,7 +15,7 @@ vars:
     default: guacamole
     placeholder: guacamole
     services:
-      - guacamole_db
+      - db
       - guacamole
     group: mysql
   MYSQL_USER:
@@ -24,7 +24,7 @@ vars:
     default: guacamole
     placeholder: guacamole
     services:
-      - guacamole_db
+      - db
       - guacamole
     group: mysql
   MYSQL_PASSWORD:
@@ -32,7 +32,7 @@ vars:
     required: true
     gen: alpha-24
     services: 
-      - guacamole_db
+      - db
       - guacamole
     group: mysql
   MYSQL_ROOT_PASSWORD:
@@ -41,5 +41,5 @@ vars:
     required: true
     gen: alpha-24
     services: 
-      - guacamole_db
+      - db
     group: mysql

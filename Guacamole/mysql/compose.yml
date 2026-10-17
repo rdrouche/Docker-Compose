@@ -1,5 +1,5 @@
 services:
-  guacamole_db:
+  db:
     image: mariadb:${MARIADB_VERSION:-11}
     container_name: guacamole_db
     hostname: guacamole_db    

@@ -1,5 +1,5 @@
 services:
-  guacamole-db:
+  db:
     image: postgres:18-alpine
     restart: ${RESTART_POLICY:-unless-stopped}
     environment:
@@ -12,7 +12,7 @@ services:
       - ./data/postgresql:/var/lib/postgresql
       - ./init:/docker-entrypoint-initdb.d
 
-  guacamole-guacd:
+  guacd:
     image: guacamole/guacd:${GUACD_VERSION:-latest}
     restart: ${RESTART_POLICY:-unless-stopped}
     user: root
@@ -24,7 +24,7 @@ services:
       - ./data/guacd/drive:/drive:rw 
       - ./data/guacd/record:/record:rw  
     
-  guacamole-web:
+  guacamole:
     image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
     restart: ${RESTART_POLICY:-unless-stopped}
     user: root
