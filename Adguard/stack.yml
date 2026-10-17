@@ -1,0 +1,10 @@
+app:
+  name: Adguard DNS Proxy Solution
+  description: ""
+  tags:
+    - dns 
+    - doh 
+  stacks:
+    - adguardhome: ADGuard Home
+    - dnsproxy: DNS Proxy
+    - dnsproxyfordocker: DNS Proxy pour Docker
