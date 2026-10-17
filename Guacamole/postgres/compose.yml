@@ -21,8 +21,8 @@ services:
     networks:
       - guacamole-net
     volumes:
-      - ./data/guacd/drive:/drive:rw 
-      - ./data/guacd/record:/record:rw  
+      - ${GUACD_PATH_DRIVE:-./data/guacd/drive}:/drive:rw 
+      - ${GUACD_PATH_RECORD:-./data/guacd/record}:/record:rw
     
   guacamole:
     image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
@@ -38,7 +38,9 @@ services:
       - guacamole-db
       - guacamole-guacd
     volumes:
-      - ./data/guacd/record:/record:rw
+      - ${GUACD_PATH_RECORD:-./data/guacd/record}:/record:rw
+    environment:
+      GUACD_HOSTNAME: ${GUACD_HOSTNAME:-guacd}
 
 networks:
   guacamole-net:
