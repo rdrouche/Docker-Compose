@@ -1,6 +1,8 @@
 ---
 name: guacamole
 
+# Use https://rdr-it.com/docker-compose/#Guacamole for generate your config file
+
 services:
   db:
     image: mariadb:${MARIADB_VERSION:-11}
@@ -11,6 +13,8 @@ services:
       - guacamole-net
     env_file:
       - env/db.env
+    environment:
+      TZ: {$TZ:-UTC}
     volumes:
       - ./guacamole_db:/var/lib/mysql
     expose:
@@ -25,6 +29,8 @@ services:
       - guacamole-net
     env_file:
       - env/guacd.env
+    environment:
+      TZ: {$TZ:-UTC}
     volumes:
       - ${GUACD_PATH_DRIVE:-./data/guacd/drive}:/drive:rw 
       - ${GUACD_PATH_RECORD:-./data/guacd/record}:/record:rw
@@ -41,6 +47,10 @@ services:
     env_file:
       - env/guacamole.env
       - env/db.env
+    environment:
+      TZ: {$TZ:-UTC}
+      MYSQL_HOSTNAME: ${MYSQL_HOSTNAME:-guacamole_db}
+      GUACD_HOSTNAME: ${GUACD_HOSTNAME:-guacd}
     depends_on:
       - db
       - guacd
@@ -50,9 +60,6 @@ services:
       - guacd
     volumes:
       - ${GUACD_PATH_RECORD:-./data/guacd/record}:/record:rw
-    environment:
-      MYSQL_HOSTNAME: ${MYSQL_HOSTNAME:-guacamole_db}
-      GUACD_HOSTNAME: ${GUACD_HOSTNAME:-guacd}
 
 networks:
   guacamole-net:
