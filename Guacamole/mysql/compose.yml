@@ -7,8 +7,6 @@ services:
     container_name: guacamole_db
     hostname: guacamole_db    
     restart: ${RESTART_POLICY:-unless-stopped}
-    env_file:
-      - db.env
     networks:
       - guacamole-net
     env_file:
@@ -26,7 +24,7 @@ services:
     networks:
       - guacamole-net
     env_file:
-      - guacamole.env
+      - env/guacd.env
     volumes:
       - ${GUACD_PATH_DRIVE:-./data/guacd/drive}:/drive:rw 
       - ${GUACD_PATH_RECORD:-./data/guacd/record}:/record:rw
@@ -41,8 +39,8 @@ services:
     networks:
       - guacamole-net
     env_file:
-      - guacamole.env
-      - db.env
+      - env/guacamole.env
+      - env/db.env
     depends_on:
       - db
       - guacd
