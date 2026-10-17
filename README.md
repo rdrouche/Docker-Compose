@@ -24,6 +24,15 @@ bash <(wget -qO- https://forge.rdr-it.com/romain/Docker-Compose/raw/branch/main/
 
 ```
 
+ou 
+
+```Bash
+
+bash <(wget -qO- https://forge.rdr-it.com/romain/Docker-Compose/raw/branch/main/get.sh) <app-name>/<stack-folder>
+
+```
+
+
 ## Personnaliser le déploiement des stacks compose
 
 Afin de garder "intacte" le fichier `docker-compose.yml` ou `compose.yml` du stack, utiliser la fonctionnalité override de Docker compose en créant un fichier `docker-compose.override.yml` ou `compose.override.yml` et en venant placer dedans vos configurations personnalisés sur le stack comme les volumes, port ...
