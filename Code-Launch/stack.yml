@@ -48,6 +48,7 @@ vars:
     placeholder: admin 
   ADMIN_PASSWORD:
     type: secret
+    default: ""
     label: Mot de passe du compte admin
     description: Si vide, le mot de passe est généré au premier démarrage du conteneur et visible dans les logs. Une fois le SSO en place peut etre désactiver avec ADMIN_LOCAL_LOGIN=false
     required: false
