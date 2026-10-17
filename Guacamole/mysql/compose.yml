@@ -3,7 +3,7 @@ services:
     image: mariadb:${MARIADB_VERSION:-11}
     container_name: guacamole_db
     hostname: guacamole_db    
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     volumes:
       - ./guacamole_db:/var/lib/mysql
     env_file:
@@ -15,7 +15,7 @@ services:
     image: guacamole/guacd:${GUACD_VERSION:-latest}
     container_name: guacd
     hostname: guacd    
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     env_file:
       - guacamole.env
     volumes:
@@ -28,7 +28,7 @@ services:
     image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
     container_name: guacamole
     hostname: guacamole
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     env_file:
       - guacamole.env
     depends_on:

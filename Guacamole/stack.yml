@@ -5,3 +5,13 @@ app:
 stacks:
   mysql: MySQL
   postgres: PostgreSQL 
+var:
+  RESTART_POLICY:
+    type: select
+    options:
+      - { value: "always",          label: "always" }
+      - { value: "unless-stopped",  label: "unless-stopped" }
+    default: unless-stopped
+    required: true
+  TZ:
+    default: UTC
