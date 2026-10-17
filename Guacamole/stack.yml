@@ -15,3 +15,6 @@ vars:
     required: true
   TZ:
     default: UTC
+  GUACD_VERSION:
+    type: text
+    default: latest

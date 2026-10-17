@@ -42,3 +42,4 @@ services:
 
 networks:
   guacamole-net:
+    name: guacamole-net
