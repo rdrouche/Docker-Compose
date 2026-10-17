@@ -24,3 +24,8 @@ vars:
   GUACAMOLE_PORT:
     type: port 
     default: 8080
+  REMOTE_IP_VALVE_ENABLED:
+    type: bool
+    default: true
+    label: Permet de recuperer IP du visiteur quand Guacamole est derriere un reverse proxy
+    group: Guacamole config
