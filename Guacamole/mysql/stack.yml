@@ -5,10 +5,6 @@ vars:
   MARIADB_VERSION:
     type: text
     default: 11
-    services:
-      - db
-    group:
-      - mysql
   MYSQL_DATABASE:
     type: text
     required: true
