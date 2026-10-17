@@ -48,7 +48,7 @@ vars:
     label: Emplacement a l interieure du conteneur où sont disponible les fichiers video
   GUACD_PATH_DRIVE:
     type: path
-    labe: Emplacement sur hote pour le mappage du partage de fichier
+    label: Emplacement sur hote pour le mappage du partage de fichier
     default: ./data/guacd/drive
   GUACD_PATH_RECORD:
     type: path
