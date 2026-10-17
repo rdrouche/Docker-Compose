@@ -4,6 +4,8 @@ services:
     container_name: guacamole_db
     hostname: guacamole_db    
     restart: ${RESTART_POLICY:-unless-stopped}
+    env_file:
+      - env/guacamole_db.env
     volumes:
       - ./guacamole_db:/var/lib/mysql
     env_file:

@@ -2,6 +2,13 @@ stack:
   - title: Avec MySQL
   - description: ""
 vars:
+  MARIADB_VERSION:
+    type: text
+    default: 11
+    services:
+      - guacamole_db
+    group:
+      - mysql
   MYSQL_DATABASE:
     type: text
     required: true
@@ -24,9 +31,15 @@ vars:
     type: secret
     required: true
     gen: alpha-24
-    default: guacamole
-    placeholder: guacamole
     services: 
       - guacamole_db
       - guacamole
+    group: mysql
+  MYSQL_ROOT_PASSWORD:
+    type: secret
+    label: Mot de passe du compte root
+    required: true
+    gen: alpha-24
+    services: 
+      - guacamole_db
     group: mysql
