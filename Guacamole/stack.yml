@@ -20,4 +20,7 @@ vars:
     default: latest
   GUACAMOLE_VERSION:
     type: text
-    default; latest
+    default: latest
+  GUACAMOLE_PORT:
+    type: port 
+    default: 8080
