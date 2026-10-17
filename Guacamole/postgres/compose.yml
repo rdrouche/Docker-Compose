@@ -1,3 +1,6 @@
+---
+name: guacamole
+
 services:
   db:
     image: postgres:18-alpine

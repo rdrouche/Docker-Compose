@@ -1,9 +1,14 @@
+---
+name: guacamole
+
 services:
   db:
     image: mariadb:${MARIADB_VERSION:-11}
     container_name: guacamole_db
     hostname: guacamole_db    
     restart: ${RESTART_POLICY:-unless-stopped}
+    env_file:
+      - db.env
     networks:
       - guacamole-net
     env_file:
@@ -37,8 +42,9 @@ services:
       - guacamole-net
     env_file:
       - guacamole.env
+      - db.env
     depends_on:
-      - guacamole_db
+      - db
       - guacd
     ports:
       - ${GUACAMOLE_PORT:-8080}:8080
