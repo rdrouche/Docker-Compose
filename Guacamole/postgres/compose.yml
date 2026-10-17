@@ -5,20 +5,19 @@ services:
   db:
     image: postgres:18-alpine
     restart: ${RESTART_POLICY:-unless-stopped}
-    environment:
-      - POSTGRES_DB=${POSTGRESQL_DATABASE}
-      - POSTGRES_USER=${POSTGRESQL_USERNAME}
-      - POSTGRES_PASSWORD=${POSTGRESQL_PASSWORD}
+    container_name: ${POSTGRESQL_HOSTNAME:-guacamole_db}
+    hostname: ${POSTGRESQL_HOSTNAME:-guacamole_db}
+    env_file:
+      - env/db.env
     networks:
       - guacamole-net 
     volumes:
-      - ./data/postgresql:/var/lib/postgresql
+      - ${POSTGRES_PATH_DATA:-./data/postgresql}:/var/lib/postgresql
       - ./init:/docker-entrypoint-initdb.d
 
   guacd:
     image: guacamole/guacd:${GUACD_VERSION:-latest}
     restart: ${RESTART_POLICY:-unless-stopped}
-    user: root
     env_file:
       - .env
     networks:
@@ -30,20 +29,21 @@ services:
   guacamole:
     image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
     restart: ${RESTART_POLICY:-unless-stopped}
-    user: root
     env_file:
-      - .env
+      - env/db.env
+      - env/guacamole.env
     networks:
       - guacamole-net
     ports:
       - ${GUACAMOLE_PORT:-8080}:8080
     depends_on:
-      - guacamole-db
-      - guacamole-guacd
+      - db
+      - guacd
     volumes:
       - ${GUACD_PATH_RECORD:-./data/guacd/record}:/record:rw
     environment:
       GUACD_HOSTNAME: ${GUACD_HOSTNAME:-guacd}
+      POSTGRESQL_HOSTNAME: ${POSTGRESQL_HOSTNAME:-guacamole_db}
 
 networks:
   guacamole-net:
