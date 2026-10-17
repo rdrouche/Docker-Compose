@@ -7,7 +7,7 @@ services:
     networks:
       - guacamole-net
     env_file:
-      - env/guacamole_db.env
+      - env/db.env
     volumes:
       - ./guacamole_db:/var/lib/mysql
     expose:
