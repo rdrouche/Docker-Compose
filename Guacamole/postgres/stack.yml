@@ -6,3 +6,7 @@ vars:
     type: text
     required: true
     default: guacamole 
+  POSTGRES_USER:
+    type: text
+    required: true
+    default: guacamole
