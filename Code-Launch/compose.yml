@@ -3,9 +3,9 @@ name: codelaunch
 
 services:
   backend:
-    image: docker pull forge.rdr-it.com/romain/docker-compose/code-launch:1.2.2-1
+    image: docker pull forge.rdr-it.com/romain/docker-compose/code-launch:${BACKEND_TAG:-latest}
     container_name: codelaunch-backend
-    restart: unless-stopped
+    restart: ${RESTART_POLICY:-unless-s}
     env_file:
       - .env
     environment:
@@ -17,11 +17,11 @@ services:
       - ${CODE_SERVER_DATA_PATH:-/code-server-data}:${CODE_SERVER_DATA_PATH:-/code-server-data}
       - ${CODE_SERVER_PASSWD_PATH:-/var/lib/code-server}:${CODE_SERVER_PASSWD_PATH:-/var/lib/code-server}
     networks:
-      - proxy
+      - ${DOCKER_NETWORK:-proxy}
       - codelaunch-internal
     labels:
       traefik.enable: "true"
-      traefik.docker.network: "proxy"
+      traefik.docker.network: "${DOCKER_NETWORK:-proxy}"
       traefik.http.routers.codelaunch.rule: "Host(`${BASE_UI_DOMAIN:-launch.example.com}`)"
       traefik.http.routers.codelaunch.tls: "true"
       traefik.http.routers.codelaunch.entrypoints: "websecure"
