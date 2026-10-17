@@ -26,3 +26,8 @@ vars:
       - db
       - guacamole
     group: Postgres
+  PGDATA:
+    type: path 
+    required: true 
+    default: /var/lib/postgresql/18/docker
+

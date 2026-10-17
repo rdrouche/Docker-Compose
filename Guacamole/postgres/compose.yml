@@ -17,17 +17,23 @@ services:
 
   guacd:
     image: guacamole/guacd:${GUACD_VERSION:-latest}
+    container_name: guacd
+    hostname: guacd 
     restart: ${RESTART_POLICY:-unless-stopped}
     env_file:
-      - .env
+      - env/guacd.env
     networks:
       - guacamole-net
     volumes:
       - ${GUACD_PATH_DRIVE:-./data/guacd/drive}:/drive:rw 
       - ${GUACD_PATH_RECORD:-./data/guacd/record}:/record:rw
+    expose:
+      - 4822
     
   guacamole:
     image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
+    container_name: guacamole
+    hostname: guacamole
     restart: ${RESTART_POLICY:-unless-stopped}
     env_file:
       - env/db.env
@@ -44,6 +50,7 @@ services:
     environment:
       GUACD_HOSTNAME: ${GUACD_HOSTNAME:-guacd}
       POSTGRESQL_HOSTNAME: ${POSTGRESQL_HOSTNAME:-guacamole_db}
+      POSTGRESQL_ENABLED: true
 
 networks:
   guacamole-net:
