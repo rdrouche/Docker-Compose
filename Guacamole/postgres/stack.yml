@@ -2,6 +2,15 @@ stack:
   - title: Avec PostgreSQL
   - description: ""
 vars:
+  POSTGRESQL_HOSTNAME:
+    type: text
+    label: Nom du conteneur PostgreSQL
+    default: guacamole_db
+    required: true
+  POSTGRES_PATH_DATA:
+    type: path 
+    default: ./guacamole_db
+    label: Emplacement sur hote Docker ou les fichiers PostgreSQL seront stocke (bind-mount)
   POSTGRES_DB:
     type: text
     required: true
