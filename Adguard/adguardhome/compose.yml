@@ -10,6 +10,6 @@ services:
       - ./workdir:/opt/adguardhome/work
       - ./confdir:/opt/adguardhome/conf
     ports:
-      - 53:53/tcp
-      - 53:53/udp            
-      - 3000:3000/tcp
+      - ${ADH_PORT_DNS:-53}:53/tcp
+      - ${ADH_PORT_DNS:-53}:53/udp            
+      - ${ADH_PORT_HTTP:-3000}:3000/tcp

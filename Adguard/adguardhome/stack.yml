@@ -1,0 +1,11 @@
+stack:
+
+vars:
+  ADH_PORT_DNS:
+    type: port 
+    required: true 
+    default: 53
+  ADH_PORT_HTTP:
+    type: port 
+    required: true 
+    default: 3000
