@@ -4,8 +4,8 @@ name: guacamole
 services:
   db:
     image: mariadb:${MARIADB_VERSION:-11}
-    container_name: guacamole_db
-    hostname: guacamole_db    
+    container_name: ${MYSQL_HOSTNAME:-guacamole_db}
+    hostname: ${MYSQL_HOSTNAME:-guacamole_db}
     restart: ${RESTART_POLICY:-unless-stopped}
     networks:
       - guacamole-net

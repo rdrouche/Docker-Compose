@@ -2,6 +2,11 @@ stack:
   - title: Avec MySQL
   - description: ""
 vars:
+  MYSQL_HOSTNAME:
+    type: text 
+    label: Nom du conteneur MariaDB
+    default: guacamole_db
+    required: true
   MARIADB_VERSION:
     type: text
     default: 11

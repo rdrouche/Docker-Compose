@@ -38,3 +38,11 @@ vars:
     group: Guacamole config
     services:
       - guacamole
+  GUACD_PATH_DRIVE:
+    type: path
+    labe: Emplacement sur hote pour le mappage du partage de fichier
+    default: ./data/guacd/drive
+  GUACD_PATH_RECORD:
+    type: path
+    labe: Emplacement sur hote pour le stockage des enregistrements des sessions
+    default: ./data/guacd/drive
