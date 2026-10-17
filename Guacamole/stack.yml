@@ -5,7 +5,7 @@ app:
 stacks:
   mysql: MySQL
   postgres: PostgreSQL 
-var:
+vars:
   RESTART_POLICY:
     type: select
     options:
