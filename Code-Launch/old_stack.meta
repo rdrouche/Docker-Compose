@@ -1,7 +1,0 @@
-[codelaunch]
-name = Code Launch
-description = Lanceur d'espace VSCode à la demande
-tags = vscode, sso
-[env]
-APP_PUBLIC_URL = required
-ADMIN_SESSION_SECRET = openssl-rand-hex-32
