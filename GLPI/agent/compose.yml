@@ -1,0 +1,12 @@
+services:
+  glpi-agent:
+    container_name: docker-glpi-agent
+    image: forge.rdr-it.com/registry/glpi-agent:${GLPI_AGENT_TAG:-latest}
+    restart: ${RESTART_POLICY:-always}
+    ports:
+      - ${AGENT_PORT_HTTP:-62354}:62354
+    volumes:
+      - ./config/toolbox.yaml:/etc/glpi-agent/toolbox.yaml:rw
+    environment:
+      GLPI_SERVER: ${GLPI_SERVER}
+      GLPI_SERVER_NO_SSL_CHECK: ${GLPI_SERVER_NO_SSL_CHECK:-true}

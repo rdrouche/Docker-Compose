@@ -1,0 +1,15 @@
+app:
+  name: GLPI et GLPI Agent
+  description: Stack Docker Compose pour déployer GLPI et GLPI Agent
+stacks:
+  glpi: glpi
+  glpi-agent: glpi-agent
+
+vars:
+  RESTART_POLICY:
+    type: select
+    options:
+      - { value: "always",          label: "always" }
+      - { value: "unless-stopped",  label: "unless-stopped" }
+    default: unless-stopped
+    required: true

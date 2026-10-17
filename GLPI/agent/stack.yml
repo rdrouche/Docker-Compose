@@ -1,0 +1,20 @@
+stack:
+  - title: GLPI Agent
+  - description: ""
+
+vars:
+  GLPI_SERVER:
+    type: url
+    label: adresse du serveur GLPI
+    placeholder: https://glpi.domain.tld
+    required: true 
+  GLPI_SERVER_NO_SSL_CHECK:
+    type: bool
+    required: true
+    default: true
+    label: désactive la verifciation du certificat https lors de l'envoie de l'inventaire vers le serveur GLPI.
+  GLPI_AGENT_TAG:
+    type: text
+    label: Tag de l'image de l'agent GLPI
+    required: true
+    default: latest
