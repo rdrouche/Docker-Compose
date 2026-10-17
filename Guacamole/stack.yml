@@ -38,6 +38,14 @@ vars:
     group: Guacamole config
     services:
       - guacamole
+  RECORDING_ENABLED:
+    type: bool 
+    default: true
+    label: Active le module qui permet l enregistrement video des sessions
+  RECORDING_SEARCH_PATH:
+    type: path 
+    default: /record
+    label: Emplacement a l interieure du conteneur où sont disponible les fichiers video
   GUACD_PATH_DRIVE:
     type: path
     labe: Emplacement sur hote pour le mappage du partage de fichier
