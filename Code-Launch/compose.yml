@@ -5,9 +5,7 @@ services:
   backend:
     image: docker pull forge.rdr-it.com/romain/docker-compose/code-launch:${BACKEND_TAG:-latest}
     container_name: codelaunch-backend
-    restart: ${RESTART_POLICY:-unless-s}
-    env_file:
-      - .env
+    restart: ${RESTART_POLICY:-unless-stopped}
     environment:
       - NODE_ENV=production
       - DATA_DIR=/data
