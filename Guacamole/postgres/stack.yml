@@ -5,8 +5,24 @@ vars:
   POSTGRES_DB:
     type: text
     required: true
-    default: guacamole 
+    default: guacamole
+    services:
+      - db
+      - guacamole
+    group: Postgres
   POSTGRES_USER:
     type: text
     required: true
     default: guacamole
+    services:
+      - db
+      - guacamole
+    group: Postgres
+  POSTGRES_PASSWORD:
+    type: secret
+    required: true
+    gen: alpha-24
+    services:
+      - db
+      - guacamole
+    group: Postgres
