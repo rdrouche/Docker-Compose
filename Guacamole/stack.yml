@@ -52,5 +52,5 @@ vars:
     default: ./data/guacd/drive
   GUACD_PATH_RECORD:
     type: path
-    labe: Emplacement sur hote pour le stockage des enregistrements des sessions
+    label: Emplacement sur hote pour le stockage des enregistrements des sessions
     default: ./data/guacd/drive
