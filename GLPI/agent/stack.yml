@@ -3,6 +3,15 @@ stack:
   - description: ""
 
 vars:
+  IMAGE_AGENT_TAG:
+    type: text 
+    default: latest
+  IMAGE_AGENT:
+    type: select
+    options:
+      - { value: "forge.rdr-it.com/registry/glpi-agent",          label: "forge.rdr-it.com/registry/glpi-agent" }
+      - { value: "rdrit/glpi-agent",  label: "rdrit/glpi-agent" }
+    default: forge.rdr-it.com/registry/glpi-agent
   GLPI_SERVER:
     type: url
     label: adresse du serveur GLPI
