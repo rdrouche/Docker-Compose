@@ -8,7 +8,7 @@ Ce projet inclut une configuration prête à l’emploi et un support pour le pl
 
 Images conteneur disponiblr sur : 
 
-- https://forge.rdr-it.com/Dockerfiles/-/packages/container/glpi-agent/
+- https://forge.rdr-it.com/registry/-/packages/container/glpi-agent/
 - https://hub.docker.com/r/rdrit/glpi-agent
 
 ---
@@ -90,7 +90,7 @@ Sur votre serveur, aller dans le dossier où vous souhaitez mettre les fichiers 
 Cloner le dossier GLPI-Agent
 
 ```console
-bash <(wget -qO- https://git.rdr-it.com/root/scripts/-/raw/master/Linux/rdr-it/get-docker-compse/get.sh) GLPI-Agent
+bash <(wget -qO- https://forge.rdr-it.com/romain/Docker-Compose/raw/branch/main/get.sh) GLPI/glpi
 ```
 
 Editer le fichier docker-compose.yml et adapter les variables.
