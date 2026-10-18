@@ -1,7 +1,7 @@
 services:
   glpi-agent:
     container_name: docker-glpi-agent
-    image: forge.rdr-it.com/registry/glpi-agent:${IMAGE_AGENT_TAG:-latest}
+    image: ${IMAGE_AGENT:-forge.rdr-it.com/registry/glpi-agent}:${IMAGE_AGENT_TAG:-latest}
     restart: ${RESTART_POLICY:-always}
     ports:
       - ${AGENT_PORT_HTTP:-62354}:62354
