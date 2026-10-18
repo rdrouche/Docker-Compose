@@ -18,3 +18,43 @@ vars:
     label: Tag de l'image de l'agent GLPI
     required: true
     default: latest
+  GLPI_SERVER_SSL_FINGER_PRINT:
+    type: text
+    label: Empreinte SSL du serveur
+    default: ""
+  GLPI_TAG:
+    type: text
+    label: Tag pour l’agent pour l'inventaire
+    default: docker-glpi-agent
+  GLPI_DEBUG:
+    type: bool
+    default: false
+    label: Activer le mode debug
+  GLPI_HTTPD:
+    type: bool
+    default: true
+    label: Activer le serveur web intégré
+  GLPI_HTTPD_PORT:
+    type: port 
+    default: 62354
+    label: Port du serveur web intégré
+  GLPI_TOOLBOX_ENABLE:
+    type: bool
+    default: 1
+    label: Activer le plugin Toolbox
+  GLPI_TOOLBOX_AUTH_ENABLE:
+    type: bool
+    default: false
+    label: Activer l’authentification du plugin Toolbox
+  GLPI_TOOLBOX_AUTH_USER:
+    type: text
+    default: "" 
+    label: Nom d’utilisateur pour l’authentification Toolbox
+  GLPI_TOOLBOX_AUTH_PASSWORD:
+    type: text 
+    default: ""
+    label: Mot de passe pour l’authentification Toolbox
+  GLPI_TOOLBOX_AUTH_PORT:
+    type: port
+    default: 62354
+    label: Port pour l’authentification Toolbox
