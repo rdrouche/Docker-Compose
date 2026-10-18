@@ -6,12 +6,14 @@ vars:
   IMAGE_AGENT_TAG:
     type: text 
     default: latest
+    requird: true
   IMAGE_AGENT:
     type: select
     options:
       - { value: "forge.rdr-it.com/registry/glpi-agent",          label: "forge.rdr-it.com/registry/glpi-agent" }
       - { value: "rdrit/glpi-agent",                              label: "rdrit/glpi-agent" }
     default: forge.rdr-it.com/registry/glpi-agent
+    required: true
   AGENT_PORT_HTTP:
     type: port 
     default: 62354
