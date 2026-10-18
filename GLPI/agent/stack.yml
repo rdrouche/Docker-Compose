@@ -12,6 +12,10 @@ vars:
       - { value: "forge.rdr-it.com/registry/glpi-agent",          label: "forge.rdr-it.com/registry/glpi-agent" }
       - { value: "rdrit/glpi-agent",                              label: "rdrit/glpi-agent" }
     default: forge.rdr-it.com/registry/glpi-agent
+  AGENT_PORT_HTTP:
+    type: port 
+    default: 62354
+    required: true
   GLPI_SERVER:
     type: url
     label: adresse du serveur GLPI
