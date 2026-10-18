@@ -1,6 +1,8 @@
 app:
   name: GLPI et GLPI Agent
+  name_en: GLPI and GLPI Agent
   description: Stack Docker Compose pour déployer GLPI et GLPI Agent
+  description_en: Docker Compose stack for deploying GLPI and GLPI Agent
 stacks:
   glpi: glpi
   agent: glpi agent
