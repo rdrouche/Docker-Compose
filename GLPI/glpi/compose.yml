@@ -71,7 +71,7 @@ services:
       retries: 3
 
   glpi-redis:
-    image: redis:latest
+    image: redis:7-alpine
     restart: ${RESTART_POLICY:-always}
     networks:
       - glpi-net
@@ -83,3 +83,5 @@ services:
 
 networks:
   glpi-net:
+    driver: bridge
+    name: glpi-net
