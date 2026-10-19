@@ -5,8 +5,10 @@ vars:
     type: domain
     label: Nom DNS du service GLPI
     label_en: DNS name of the GLPI service
-    default: glpi-web,glpi-cron
     required: true
+    services:
+      - glpi-web
+      - glpi-cron
     group: glpi-web
     placeholder: glpi.domain.tld
   GLPI_HTTP_PROTOCOLE:
@@ -36,5 +38,37 @@ vars:
     gen: alpha-24
     services:
       - glpi-db
+    group: glpi-db
+  GLPI_DB_NAME:
+    label: Nom de la base de données
+    label_en: GLPI Database name
+    default: glpi
+    required: true
+    services:
+      - glpi-web
+      - glpi-db
+      - glpi-cron
+    group: glpi-db
+    placeholder: glpi
+  GLPI_DB_USER:
+    label: Utilisateur MariaDB
+    label_en: MariaDB user
+    default: glpi
+    required: true
+    services:
+      - glpi-web
+      - glpi-db
+      - glpi-cron
+    group: glpi-db
+    placeholder: glpi
+  GLPI_DB_PASSWORD:
+    type: password
+    label: Mot de passe pour utilisateur GLPI_DB_USER
+    label_en: Password for GLPI_DB_USER user
+    gen: alpha-24
+    services:
+      - glpi-web
+      - glpi-db
+      - glpi-cron
     group: glpi-db
 groups: { glpi-web:, glpi-cron:, glpi-db: }
