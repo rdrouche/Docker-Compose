@@ -7,6 +7,14 @@ vars:
     options:
       - forge.rdr-it.com/registry/glpi
       - rdrit/glpi
+  GLPI_WEB_IMAGE_TAG:
+    type: select
+    default: latest
+    options:
+      - glpi-php85
+      - glpi-php84
+      - glpi-php83
+      - latest
   GLPI_DOMAIN:
     type: domain
     label: Nom DNS du service GLPI
@@ -91,4 +99,11 @@ vars:
       - glpi-db
     true_value: "1"
     false_value: "0"
+  GLPI_WEB_PORT:
+    type: port
+    label: Port de publication sur l hôte Docker
+    label_en: Port publishing on the Docker host
+    default: 80
+    required: true
+    group: glpi-web
 groups: { glpi-web:, glpi-cron:, glpi-db: }
