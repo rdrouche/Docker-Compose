@@ -31,6 +31,13 @@ vars:
       - glpi-web
       - glpi-cron
     group: glpi-web
+  GLPI_TIMEZONE:
+    default: UTC
+    required: true
+    services:
+      - glpi-web
+      - glpi-cron
+      - glpi-db
   MYSQL_ROOT_PASSWORD:
     type: password
     label: Mot de passe du compte root
@@ -71,4 +78,11 @@ vars:
       - glpi-db
       - glpi-cron
     group: glpi-db
+  MARIADB_AUTO_UPGRADE:
+    type: bool
+    default: true
+    services:
+      - glpi-db
+    true_value: "1"
+    false_value: "0"
 groups: { glpi-web:, glpi-cron:, glpi-db: }
