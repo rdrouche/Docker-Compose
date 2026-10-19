@@ -22,7 +22,6 @@ vars:
     required: true
     services:
       - glpi-web
-      - glpi-cron
     group: GLPI
     placeholder: glpi.domain.tld
   GLPI_HTTP_PROTOCOLE:
@@ -31,7 +30,6 @@ vars:
     required: true
     services:
       - glpi-web
-      - glpi-cron
     group: GLPI
     options:
       - http
@@ -43,7 +41,6 @@ vars:
     required: true
     services:
       - glpi-web
-      - glpi-cron
     group: GLPI
   GLPI_TIMEZONE:
     default: UTC
@@ -64,7 +61,6 @@ vars:
     services:
       - glpi-web
       - glpi-db
-      - glpi-cron
     group: Database
     placeholder: glpi
   GLPI_DB_USER:
@@ -75,7 +71,6 @@ vars:
     services:
       - glpi-web
       - glpi-db
-      - glpi-cron
     group: Database
     placeholder: glpi
   GLPI_DB_PASSWORD:
@@ -86,7 +81,6 @@ vars:
     services:
       - glpi-web
       - glpi-db
-      - glpi-cron
     group: Database
   MARIADB_AUTO_UPGRADE:
     type: bool
@@ -109,6 +103,7 @@ vars:
     services:
       - glpi-web
     group: GLPI
+    placeholder: glpi-redis
   GLPI_REDIS_ENABLE:
     type: select
     default: No
@@ -118,4 +113,15 @@ vars:
     options:
       - Yes
       - No
-groups: { glpi-web:, glpi-cron:, glpi-db: }
+  GLPI_TIMEZONE_CONFIG:
+    type: select
+    label: Configurer les timezones dans GLPI
+    label_en: Configuring time zones in GLPI
+    default: Yes
+    required: true
+    services:
+      - glpi-web
+    group: GLPI
+    options:
+      - Yes
+      - No
