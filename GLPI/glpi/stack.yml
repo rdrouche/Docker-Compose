@@ -23,7 +23,7 @@ vars:
     services:
       - glpi-web
       - glpi-cron
-    group: glpi-web
+    group: GLPI
     placeholder: glpi.domain.tld
   GLPI_HTTP_PROTOCOLE:
     type: select
@@ -32,7 +32,7 @@ vars:
     services:
       - glpi-web
       - glpi-cron
-    group: glpi-web
+    group: GLPI
     options:
       - http
       - https
@@ -44,14 +44,10 @@ vars:
     services:
       - glpi-web
       - glpi-cron
-    group: glpi-web
+    group: GLPI
   GLPI_TIMEZONE:
     default: UTC
     required: true
-    services:
-      - glpi-web
-      - glpi-cron
-      - glpi-db
   MYSQL_ROOT_PASSWORD:
     type: password
     label: Mot de passe du compte root
@@ -59,7 +55,7 @@ vars:
     gen: alpha-24
     services:
       - glpi-db
-    group: glpi-db
+    group: Database
   GLPI_DB_NAME:
     label: Nom de la base de données
     label_en: GLPI Database name
@@ -69,7 +65,7 @@ vars:
       - glpi-web
       - glpi-db
       - glpi-cron
-    group: glpi-db
+    group: Database
     placeholder: glpi
   GLPI_DB_USER:
     label: Utilisateur MariaDB
@@ -80,7 +76,7 @@ vars:
       - glpi-web
       - glpi-db
       - glpi-cron
-    group: glpi-db
+    group: Database
     placeholder: glpi
   GLPI_DB_PASSWORD:
     type: password
@@ -91,12 +87,13 @@ vars:
       - glpi-web
       - glpi-db
       - glpi-cron
-    group: glpi-db
+    group: Database
   MARIADB_AUTO_UPGRADE:
     type: bool
     default: true
     services:
       - glpi-db
+    group: Database
     true_value: "1"
     false_value: "0"
   GLPI_WEB_PORT:
@@ -105,5 +102,20 @@ vars:
     label_en: Port publishing on the Docker host
     default: 80
     required: true
-    group: glpi-web
+    group: GLPI
+  GLPI_REDIS_SERVER:
+    label: Nom du service Redis
+    label_en: Redis service name
+    services:
+      - glpi-web
+    group: GLPI
+  GLPI_REDIS_ENABLE:
+    type: select
+    default: No
+    services:
+      - glpi-web
+    group: GLPI
+    options:
+      - Yes
+      - No
 groups: { glpi-web:, glpi-cron:, glpi-db: }
