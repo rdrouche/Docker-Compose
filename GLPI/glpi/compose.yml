@@ -1,6 +1,6 @@
 services:
   glpi-web:
-    image: rdrit/glpi:{GLPI_WEB_IMAGE_TAG:-latest}
+    image: ${REGISTRY_IMG_GLPI:-rdrit/glpi}:{GLPI_WEB_IMAGE_TAG:-latest}
     restart: ${RESTART_POLICY:-always}
     networks:
       - glpi-net
@@ -17,7 +17,7 @@ services:
         condition: service_healthy
 
   glpi-cron:
-    image: rdrit/glpi:{GLPI_WEB_IMAGE_TAG:-latest}
+    image: ${REGISTRY_IMG_GLPI:-rdrit/glpi}:{GLPI_WEB_IMAGE_TAG:-latest}
     restart: ${RESTART_POLICY:-always}
     networks:
       - glpi-net

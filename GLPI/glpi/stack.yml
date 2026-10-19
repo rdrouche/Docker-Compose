@@ -1,6 +1,12 @@
 stack:
   title: glpi
 vars:
+  REGISTRY_IMG_GLPI:
+    type: select
+    default: forge.rdr-it.com/registry/glpi
+    options:
+      - forge.rdr-it.com/registry/glpi
+      - rdrit/glpi
   GLPI_DOMAIN:
     type: domain
     label: Nom DNS du service GLPI
