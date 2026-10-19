@@ -6,14 +6,14 @@ Environnement complet GLPI + MariaDB + Redis + Cron
 
 Ce dépôt fournit une stack entièrement opérationnelle pour déployer GLPI via Docker, incluant :
 
-* 🌐 GLPI Web [Docker hub](https://hub.docker.com/r/rdrit/glpi)
+* 🌐 GLPI Web [Docker hub](https://hub.docker.com/r/rdrit/glpi) - [Forge RDR-IT](https://forge.rdr-it.com/registry/-/packages/container/glpi/)
 * 🗄️ MariaDB 11 optimisée
 * ⚡ Redis pour le cache (optionnel)
 * ⏱️ Cron GLPI (exécution automatique)
 
 
-- forge.rdr-it.com [docker-compose.yml](https://forge.rdr-it.com/romain/Docker-Compose/src/branch/main/GLPI)
-- Github [docker-compose.yml](https://github.com/rdrouche/Docker-Compose/tree/main/GLPI)
+- forge.rdr-it.com [compose.yml](https://forge.rdr-it.com/romain/Docker-Compose/src/branch/main/GLPI/glpi)
+- Github [compose.yml](https://github.com/rdrouche/Docker-Compose/tree/main/GLPI/glpi)
 
 ## Tutoriels
 
@@ -27,6 +27,8 @@ Ce dépôt fournit une stack entièrement opérationnelle pour déployer GLPI vi
 * 4Go de Ram
 
 ## 🔧 Configuration (.env)
+
+Utiliser le générateur de [Stack Docker Compose](https://rdr-it.com/docker-compose/#GLPI/glpi) sur RDR-IT.
 
 Le fichier .env permet de personnaliser toute la stack :
 
