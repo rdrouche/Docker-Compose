@@ -60,7 +60,7 @@ Le fichier .env permet de personnaliser toute la stack :
 ```console
 mkdir -p /containers/glpi
 cd /contaienrs/glpi
-bash <(wget -qO- https://forge.rdr-it.com/romain/Docker-Compose/raw/branch/main/get.sh) GLPI
+bash <(wget -qO- https://forge.rdr-it.com/romain/Docker-Compose/raw/branch/main/get.sh) GLPI/glpi
 ```
 2️⃣ Modifier le fichier .env avec vos valeurs.
 
