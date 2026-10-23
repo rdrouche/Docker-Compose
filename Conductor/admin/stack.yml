@@ -74,6 +74,8 @@ vars:
       - { value: "en",          label: "English" }
       - { value: "fr",          label: "Français" }
     default: fr
+    services:
+      - conductor
   SESSION_SECRET:
     type: text
     required: true
