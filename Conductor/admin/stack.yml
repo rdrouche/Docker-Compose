@@ -1,0 +1,112 @@
+stack:
+  title: Console d'administration
+  tiltle_en: Administration console
+  description: ""
+  description_en: ""
+
+vars:
+  ADMIN_TAG:
+    type: text
+    default: latest
+    group: Conductor
+  CONDUCTOR_USER:
+    type: text
+    default: "1000:1000"
+    required: false
+    group: Conductor
+  CONDUCTOR_DATA_DIR_HOST:
+    type: path
+    default: ./conductor/data
+    label: Emplacement du dossiers data de conductor sur l'hote
+    label_en: Location of the Conductor data directories on the host
+    required: false
+    group: Conductor
+  STACKS_DIR:
+    type: path
+    default: /stacks
+    label: Point de montage dans du dossier stack dans le conteneur
+    label_en: Mount point within the stack directory in the container
+    required: false
+    group: Conductor
+  STACKS_DIR_HOST:
+    type: path
+    default: ./conductor/stacks
+    label: Emplacement du dossiers stacks sur l'hote Docker
+    label_en: Location of the stacks directory on the Docker host
+    required: false
+    group: Conductor
+  CONDUCTOR_PORT_PUBLISH:
+    type: port
+    default: 3000
+    label: Port de publication de l'interface Web
+    label_en: Web interface publication port
+    required: false
+    group: Conductor
+  REDIS_PASSWORD:
+    type: secret
+    label: Mot de passe REDIS
+    label_en: Redis Password 
+    gen: alpha-24
+    required: true
+    group: Redis
+  # conductor.env
+  BASE_DOMAIN:
+    type: domain
+    required: true
+    placeholder: domain.tld
+    services:
+      - conductor
+    label: Domaine de base. Sert à déduire term-<id>.<domaine> et test-app-<id>.<domaine>
+    label_en: Base domain. Used to derive term-<id>.<domain> and test-app-<id>.<domain>
+    group: Conductor
+  CONDUCTOR_DOMAIN:
+    type: domain
+    required: true
+    placeholder: conductor.domain.tld
+    services:
+      - conductor
+    label: Nom DNS pour accès à l'interface web
+    label_en: DNS name for web interface access
+    group: Conductor
+  DASHBOARD_LANG:
+    type: select
+    options:
+      - { value: "en",          label: "English" }
+      - { value: "fr",          label: "Français" }
+    default: fr
+  SESSION_SECRET:
+    type: text
+    required: true
+    gen: openssl-rand-hex-32
+    services:
+      - conductor
+    label: Signe le cookie de session du dashboard admin
+    label_en: Signs the admin dashboard session cookie
+    group: Conductor
+  CONDUCTOR_SECRET:
+    type: text
+    required: true
+    gen: openssl-rand-hex-32
+    services:
+      - conductor
+    label: Secret interne. Sert de repli de sel pour le hash des IP
+    label_en: Internal secret. Used as a salt for hashing IP addresses.
+    group: Conductor
+  API_TOKEN_SECRET:
+    type: text
+    required: true
+    gen: openssl-rand-hex-32
+    services:
+      - conductor
+    group: Conductor
+  SETTINGS_KEY:
+    type: text
+    required: true
+    gen: openssl-rand-hex-32
+    services:
+      - conductor
+    group: Conductor
+    label: Chiffre les secrets stockés en base
+    label_en: Encrypts secrets stored in the database
+
+
