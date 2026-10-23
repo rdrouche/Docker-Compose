@@ -1,0 +1,31 @@
+#
+# Traefik est utilise pour la publication automatique
+# des Apps / Terms via les labels
+#
+#  [reverse frontale] --- http ---> [traefik]  --- > [app]
+# 
+services:
+  traefik:
+    image: traefik:v3
+    restart: ${RESTART_POLICY:-unless-stopped}
+    command:
+      - "--log.level=ERROR"
+      - "--accesslog=false"
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--entrypoints.web.address=:80"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=proxy"
+      - "--providers.docker.watch=true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 8080:8080
+networks:
+  proxy:
+    name: proxy
+    driver: bridge
