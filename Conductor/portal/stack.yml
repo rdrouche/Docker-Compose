@@ -8,7 +8,7 @@ vars:
   PORTAL_TAG:
     type: text
     default: latest
-    group: Conductor
+    group: portal
   PORTAL_PUBLIC_URL:
     type: url 
     required: true
