@@ -8,6 +8,7 @@ stacks:
   admin: Administration console
   portal: User portal
   agent: Launch server agent
+  traefik: Traefik for Labs and Apps
 
 vars:
   RESTART_POLICY:
