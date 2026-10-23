@@ -29,6 +29,8 @@ services:
       - portal.env
     volumes:
       - ./data/portal:/app/data
+    ports:
+      - ${PORTAL_PORT_PUBLISH:-4000}:4000
     # Uncomment of conductor and portal are one same host
     #neworks:
     #  - net-conductor

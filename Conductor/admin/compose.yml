@@ -23,6 +23,9 @@ services:
     restart: ${RESTART_POLICY:-unless-stopped}
     container_name: conductor
     user: ${CONDUCTOR_USER:-1000:1000}
+    depends_on:
+      init-perms:
+        condition: service_completed_successfully
     env_file:
       - conductor.env
     environment:

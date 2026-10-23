@@ -1,0 +1,20 @@
+stack:
+  title: Agent conductor
+  tiltle_en: Agent
+  description: "The agent configuration (variables) can be generated from the Conductor interface."
+  description_en: ""
+
+vars:
+  AGENT_TAG:
+    type: text 
+    default: latest
+  APP_DATA_ROOT:
+    type: path
+    default: /var/conductor-agents/apps
+    label: Chemin absolu sur l'hôte où sont stockées les données persistantes des applications.
+    label_en: Absolute path on the host where persistent application data is stored.
+    description: Ne pas utiliser de chemin relatif `./apps` car le volume est mappé dans les conteneurs applicatifs à données persistantes
+    description_en: Do not use a relative path like `./apps`, as the volume is mapped into the application containers for persistent data.
+  AGENT_PORT_PUBLISH:
+   type: port
+   default: 3001

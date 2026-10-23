@@ -1,0 +1,46 @@
+
+services:
+  init-perms:
+    image: alpine:3.20
+    user: root
+    restart: "no"
+    network_mode: none
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        mkdir -p /data/agent
+        chown -R 1000:1000 /data
+        chown 1000:1000 /apps && chmod 711 /apps
+    volumes:
+      - ./data:/data
+      - ${APP_DATA_ROOT:-/var/conductor-agents/apps}:/apps
+
+  agent:
+    image: forge.rdr-it.com/registry/conductor/agent:${AGENT_TAG:-latest}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    group_add:
+      - "${DOCKER_GID:-999}"
+    user: "node"
+    depends_on:
+      init-perms:
+        condition: service_completed_successfully
+    env_file:
+      - agent.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/agent:/app/data
+      - ${APP_DATA_ROOT:-/var/conductor-agents/apps}:${APP_DATA_ROOT:-/var/conductor-agents/apps}
+    ports:
+      - ${AGENT_PORT_PUBLISH:-3001}:3001
+    networks:
+      - agent-internal
+      - proxy
+
+networks:
+  agent-internal:
+    driver: bridge
+    internal: true
+  proxy:
+    external: true

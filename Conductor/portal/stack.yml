@@ -8,6 +8,9 @@ vars:
   PORTAL_TAG:
     type: text
     default: latest
+  PORTAL_PORT_PUBLISH:
+    type: port 
+    default: 4000
   PORTAL_USER:
     type: text
     default: 1000:1000
