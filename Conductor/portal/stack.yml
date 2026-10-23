@@ -8,7 +8,9 @@ vars:
   PORTAL_TAG:
     type: text
     default: latest
-    group: portal
+  PORTAL_USER:
+    type: text
+    default: 1000:1000
   PORTAL_PUBLIC_URL:
     type: url 
     required: true
@@ -16,6 +18,8 @@ vars:
     label: URL publique du portail utilisateurs
     label_en: Public URL of the user portal
     group: portal
+    services:
+      - portal
   PORTAL_CONDUCTOR_URL:
     type: url 
     required: true
@@ -25,6 +29,8 @@ vars:
     description: "Si Conductor et le portail sont sur le même serveur, connecter le service portal sur le même réseau Docker que Conductor et laisser http://conductor:3000, sur des serveurs différents, entrer l'url publique de Conductor https://conductor.domain.tld."
     description_en: "If Conductor and the portal are on the same server, connect the portal service to the same Docker network as Conductor and leave it as http://conductor:3000; if they are on different servers, enter the public URL for Conductor: https://conductor.domain.tld."
     group: portal
+    services:
+      - portal
   PORTAL_CONDUCTOR_TOKEN:
     type: text
     required: true
@@ -33,6 +39,8 @@ vars:
     description: Le token doit être généré depuis Conductor.
     description_en: The token must be generated from Conductor.
     group: portal
+    services:
+      - portal
 
 networks:
   net-conductor:
@@ -40,3 +48,7 @@ networks:
     description: "À cocher si le portail tourne sur le même serveur que l'admin"
     external: true
     name: net-conductor
+    attach:
+      - portal
+    create: existing
+    created_by: Conductor stack

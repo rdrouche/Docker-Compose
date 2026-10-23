@@ -5,6 +5,15 @@ services:
   portal:
     image: forge.rdr-it.com/registry/conductor/portal:${PORTAL_TAG:-latest}
     restart: ${RESTART_POLICY:-unless-stopped}
-    user: ${CONDUCTOR_USER:-1000:1000}
+    user: ${PORTAL_USER:-1000:1000}
     env_file:
       - portal.env
+    # Uncomment of conductor and portal are one same host
+    #neworks:
+    #  - net-conductor
+
+# Uncomment of conductor and portal are one same host
+#networks:
+#  net-conductor:
+#    name: net-conductor
+#    external: true
