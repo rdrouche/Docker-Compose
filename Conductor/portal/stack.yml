@@ -1,8 +1,6 @@
 stack:
   title: Portail utilisateurs
   tiltle_en: User portal
-  description: ""
-  description_en: ""
 
 vars:
   PORTAL_TAG:

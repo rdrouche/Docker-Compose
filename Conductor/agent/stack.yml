@@ -1,8 +1,8 @@
 stack:
   title: Agent conductor
   tiltle_en: Agent
-  description: "The agent configuration (variables) can be generated from the Conductor interface."
-  description_en: ""
+  description: "La configuration de l’agent (variables) peut être générée depuis l’interface Conductor."
+  description_en: The agent configuration (variables) can be generated from the Conductor interface."
 
 vars:
   AGENT_TAG:
@@ -18,6 +18,23 @@ vars:
   AGENT_PORT_PUBLISH:
    type: port
    default: 3001
+  AGENT_TOKEN:
+    type: text
+    required: warn
+  CONDUCTOR_URL:
+    type: url 
+    required: warn
+    placeholder: https://conductor.domain.tld
+    label: Adresse du conductor pour synchroniser stacks et liste d'images
+    label_en: Conductor address for synchronizing stacks and the list of images
+  CONDUCTOR_REPORING_URL:
+    type: url 
+    required: warn
+    placeholder: https://conductor.domain.tld
+    label: Conductor vu par les terminaux de cet agent (logs de commandes).
+    label_en: Conductor as viewed from this agent's terminals (command logs).
+    description: Obligatoire sur un agent distant. En https://, le certificat doit être reconnu par les conteneurs
+    description_en: Required on a remote agent. When using https://, the certificate must be recognized by the containers.
 
 networks:
   net-conductor:
