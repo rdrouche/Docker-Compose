@@ -1,0 +1,19 @@
+app:
+  name: Conductor
+  name_en: Conductor
+  description: Plateforme de gestion de stacks Docker à la demande pour formations interactives et d'application à la demande.
+  description_en: On-demand Docker stack management platform for interactive training and on-demand applications
+
+stacks:
+  admin: Administration console
+  portal: User portal
+  agent: Launch server agent
+
+vars:
+  RESTART_POLICY:
+    type: select
+    options:
+      - { value: "always",          label: "always" }
+      - { value: "unless-stopped",  label: "unless-stopped" }
+    default: unless-stopped
+    required: true
