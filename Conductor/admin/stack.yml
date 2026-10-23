@@ -14,13 +14,6 @@ vars:
     default: "1000:1000"
     required: false
     group: Conductor
-  STACKS_DIR_HOST:
-    type: path
-    default: ./conductor/stacks
-    label: Emplacement du dossiers stacks sur l'hote Docker
-    label_en: Location of the stacks directory on the Docker host
-    required: false
-    group: Conductor
   CONDUCTOR_PORT_PUBLISH:
     type: port
     default: 3000
