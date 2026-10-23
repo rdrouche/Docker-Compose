@@ -18,3 +18,13 @@ vars:
   AGENT_PORT_PUBLISH:
    type: port
    default: 3001
+
+networks:
+  net-conductor:
+    label: Réseau proxy Traefik pour publication automatique
+    external: true
+    name: proxy
+    attach:
+      - agent
+    create: existing
+    created_by: Traefik
