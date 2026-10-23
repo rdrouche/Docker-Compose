@@ -33,7 +33,7 @@ vars:
       - portal
   PORTAL_CONDUCTOR_TOKEN:
     type: text
-    required: true
+    required: warn
     label: Jeton API du Conductor (créé dans Admin → API Tokens, scopes launch et apps)
     label_en: Conductor API token (created in Admin → API Tokens, scopes launch and apps)
     description: Le token doit être généré depuis Conductor.
