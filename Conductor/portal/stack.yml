@@ -1,0 +1,39 @@
+stack:
+  title: Portail utilisateurs
+  tiltle_en: User portal
+  description: ""
+  description_en: ""
+
+vars:
+  PORTAL_TAG:
+    type: text
+    default: latest
+    group: Conductor
+  PORTAL_PUBLIC_URL:
+    type: url 
+    required: true
+    placeholder: https://portal.domain.tld
+    label: URL publique du portail utilisateurs
+    label_en: Public URL of the user portal
+  PORTAL_CONDUCTOR_URL:
+    type: url 
+    required: true
+    label: Adresse du Conductor vue depuis le portail
+    label_en: Conductor address as seen from the portal
+    default: http://conductor:3000
+    description: Si Conductor et le portail sont sur le même serveur, connecter le service portal sur le même réseau Docker que Conductor et laisser http://conductor:3000, sur des serveurs différents, entrer l'url publique de Conductor https://conductor.domain.tld.
+    description_en: If Conductor and the portal are on the same server, connect the portal service to the same Docker network as Conductor and leave it as http://conductor:3000; if they are on different servers, enter the public URL for Conductor: https://conductor.domain.tld.
+  PORTAL_CONDUCTOR_TOKEN:
+    type: text
+    required: true
+    label: Jeton API du Conductor (créé dans Admin → API Tokens, scopes launch et apps)
+    label_en: Conductor API token (created in Admin → API Tokens, scopes launch and apps)
+    description: Le token doit être généré depuis Conductor.
+    description_en: The token must be generated from Conductor.
+
+networks:
+  net-conductor:
+    label: Réseau de l'admin Conductor
+    description: À cocher si le portail tourne sur le même serveur que l'admin
+    external: true
+    name: net-conductor

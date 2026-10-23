@@ -1,0 +1,10 @@
+---
+name: conductor-portal
+
+services:
+  portal:
+    image: forge.rdr-it.com/registry/conductor/portal:${PORTAL_TAG:-latest}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    user: ${CONDUCTOR_USER:-1000:1000}
+    env_file:
+      - portal.env
