@@ -41,6 +41,15 @@ vars:
     group: portal
     services:
       - portal
+  PORTAL_ADMIN_EMAIL:
+    type: email 
+    required: warm 
+    placeholder: admin@domain.tld 
+    group: portal 
+    services:
+      - portal
+    label: Compte admin du dashboard, créé au premier démarrage.
+    label_en: Dashboard admin account, created upon first startup.
 
 networks:
   net-conductor:

@@ -2,12 +2,33 @@
 name: conductor-portal
 
 services:
+
+  init-perms:
+    image: alpine:3.20
+    user: root
+    restart: "no"
+    network_mode: none
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        mkdir -p /data/portal
+        chown -R 1000:1000 /data
+    volumes:
+      - ./data:/data
+
   portal:
     image: forge.rdr-it.com/registry/conductor/portal:${PORTAL_TAG:-latest}
     restart: ${RESTART_POLICY:-unless-stopped}
     user: ${PORTAL_USER:-1000:1000}
+    depends_on:
+      init-perms:
+        condition: service_completed_successfully
     env_file:
       - portal.env
+    volumes:
+      - ./data/portal:/app/data
     # Uncomment of conductor and portal are one same host
     #neworks:
     #  - net-conductor
