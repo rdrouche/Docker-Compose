@@ -14,20 +14,6 @@ vars:
     default: "1000:1000"
     required: false
     group: Conductor
-  CONDUCTOR_DATA_DIR_HOST:
-    type: path
-    default: ./conductor/data
-    label: Emplacement du dossiers data de conductor sur l'hote
-    label_en: Location of the Conductor data directories on the host
-    required: false
-    group: Conductor
-  STACKS_DIR:
-    type: path
-    default: /stacks
-    label: Point de montage dans du dossier stack dans le conteneur
-    label_en: Mount point within the stack directory in the container
-    required: false
-    group: Conductor
   STACKS_DIR_HOST:
     type: path
     default: ./conductor/stacks

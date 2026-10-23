@@ -2,6 +2,22 @@
 name: conductor
 
 services:
+  init-perms:
+    image: alpine:3.20
+    user: root
+    restart: "no"
+    network_mode: none
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        mkdir -p /data/conductor
+        chown -R 1000:1000 /data /stacks
+    volumes:
+      - ./data:/data
+      - ./stacks:/stacks
+
   conductor:
     image: forge.rdr-it.com/registry/conductor/admin:${ADMIN_TAG:-latest}
     restart: ${RESTART_POLICY:-unless-stopped}
@@ -14,8 +30,8 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
     volumes:
-      - ${CONDUCTOR_DATA_DIR_HOST:-./conductor/data}:/app/data
-      - ${STACKS_DIR_HOST:-./conductor/stacks}:${STACKS_DIR:-/stacks}
+      - ./data/conductor:/app/data
+      - ./stacks:/stacks
     ports:
       - ${CONDUCTOR_PORT_PUBLISH:-3000}:3000
     networks:
