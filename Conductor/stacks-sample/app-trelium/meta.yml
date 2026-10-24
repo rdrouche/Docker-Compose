@@ -1,0 +1,15 @@
+# meta.yml
+name: Trilium notes
+description: Organisez vos pensées. Construisez votre base de connaissances personnelles.
+category: app
+access_mode: premium
+
+kind: app
+lifecycle: always_on
+persistence: bind
+data_mount: /home/node/trilium-data
+data_quota_mb: 20
+tiers:
+  - premium
+app_port: 8080
+ready_path: /

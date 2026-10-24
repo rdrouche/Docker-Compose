@@ -1,0 +1,74 @@
+# Stack formation Linux — Ubuntu 22.04 avec SSH
+services:
+
+  debian:
+    image: forge.rdr-it.com/registry/labs/debian13-ssh:latest
+    #build:
+    #  context: /base-images/ubuntu-ssh
+    #  dockerfile: Dockerfile
+    restart: "no"
+    hostname: debian
+    environment:
+      ROOT_PASSWORD: "formation"
+    networks:
+      session_internal:
+        aliases: [debian]
+    tmpfs:
+      - /tmp:size=256m
+      - /root:size=256m
+    deploy:
+      resources:
+        limits:
+          cpus: "${CPU_LIMIT:-0.5}"
+          memory: "${MEM_LIMIT:-256m}"
+
+  terminal:
+    image: forge.rdr-it.com/registry/labs/terminal-server:latest
+    restart: "no"
+    depends_on:
+      - debian
+    environment:
+      TERM_PORT:  "7681"
+      SESSION_ID: "${SESSION_ID}"
+      CONDUCTOR_INTERNAL_URL: "${CONDUCTOR_INTERNAL_URL}"
+      SESSION_TOKEN:          "${SESSION_TOKEN}"
+      TERM_SECURITY_REPORT:   "${TERM_SECURITY_REPORT}"
+      TERM_TITLE: "RDR-IT — Linux TP (Debian 13)"
+      SSH_HOST:   "debian"
+      SSH_USER:   "root"
+      SSH_PASS:   "formation"
+    networks:
+      - session_internal
+      - proxy
+      - rdr-reporting
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: "128m"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:7681/health"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 15s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.${SESSION_ID}.rule=Host(`${SESSION_ID}.${DOMAIN_SUFFIX}`)"
+      - "traefik.http.routers.${SESSION_ID}.tls=false"
+      - "traefik.http.routers.${SESSION_ID}.entrypoints=web"
+      - "traefik.http.services.${SESSION_ID}.loadbalancer.server.port=7681"
+      - "traefik.http.middlewares.${SESSION_ID}-sec.headers.customFrameOptionsValue=SAMEORIGIN"
+      - "traefik.http.middlewares.${SESSION_ID}-sec.headers.contentTypeNosniff=true"
+      - "traefik.http.routers.${SESSION_ID}.middlewares=${SESSION_ID}-sec"
+
+networks:
+  session_internal:
+    driver: bridge
+  proxy:
+    external: true
+    name: proxy
+  rdr-reporting:
+    name: rdr-reporting
+    external: true

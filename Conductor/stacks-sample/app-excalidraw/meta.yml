@@ -1,0 +1,21 @@
+name: Excalidraw
+description: Tableau blanc et schémas à main levée. Vos dessins sont enregistrés dans votre navigateur.
+category: app
+access_mode: auth
+
+# Application à la demande : adresse stable https://<instance>.<domaine apps> (voir APPS-A-LA-DEMANDE.md)
+kind: app
+persistence: none          # none = données dans le navigateur | bind = dossier serveur
+browser_storage: true      # affiche l'avertissement « données dans ce navigateur »
+tiers: [auth, premium]
+app_port: 80               # port HTTP de l'image — à vérifier pour la version épinglée
+ready_path: /
+icon: https://excalidraw.com/favicon.ico
+
+resources:
+  auth:
+    cpus: 0.3
+    memory: 128m
+  premium:
+    cpus: 0.5
+    memory: 256m

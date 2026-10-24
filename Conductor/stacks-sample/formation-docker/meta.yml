@@ -1,0 +1,15 @@
+name: Formation Docker
+description: Apprenez Docker avec un daemon DinD complet — images, conteneurs, volumes, réseaux, Compose
+category: formation
+access_mode: free
+start_timeout_s: 60
+ttl:
+  free: 1800
+  auth: 3600
+resources:
+  free:
+    cpus: "2.0"
+    memory: "1g"
+prefetch:
+  - forge.rdr-it.com/registry/labs/dind/27-dind:latest
+  - forge.rdr-it.com/registry/labs/terminal-server:latest

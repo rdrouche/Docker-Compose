@@ -1,0 +1,23 @@
+services:
+  app:
+    image: triliumnext/notes
+    restart: "${RESTART_POLICY:-unless-stopped}"
+    networks: 
+      - proxy
+    volumes:
+      - "${INSTANCE_DATA}:${DATA_MOUNT:-/home/node/trilium-data}"
+    deploy:
+      resources:
+        limits:
+          cpus: "${CPU_LIMIT:-0.5}"
+          memory: "${MEM_LIMIT:-256m}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.app-${INSTANCE_ID}.rule=Host(`${INSTANCE_ID}.${APP_DOMAIN_SUFFIX}`)"
+      - "traefik.http.routers.app-${INSTANCE_ID}.tls=false"
+      - "traefik.http.routers.app-${INSTANCE_ID}.entrypoints=web"
+      - "traefik.http.services.app-${INSTANCE_ID}.loadbalancer.server.port=${APP_PORT:-8080}"
+networks:
+  proxy:
+    external: true

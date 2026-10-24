@@ -1,0 +1,58 @@
+# Stack app-apache
+# Site Apache accessible publiquement via Traefik
+# URL : https://app-${SESSION_ID}.${APP_DOMAIN_SUFFIX}
+
+services:
+
+  apache:
+    image: httpd:2.4-alpine
+    restart: "no"
+    networks:
+      - session_internal
+      - proxy
+    tmpfs:
+      - /tmp:size=32m
+      - /usr/local/apache2/logs:size=32m
+      - /usr/local/apache2/htdocs:size=64m
+    environment:
+      SESSION_ID: "${SESSION_ID}"
+      APP_PORT: "80"
+    # Générer la page d'accueil avec printf (évite le heredoc << dans YAML)
+    command: >
+      sh -c "
+        printf '<!DOCTYPE html><html lang=\"fr\"><head><meta charset=\"UTF-8\">
+        <title>RDR-IT App Apache</title>
+        <style>body{font-family:sans-serif;max-width:600px;margin:80px auto;padding:20px}
+        h1{color:#2ea8ff}.sid{background:#f0f4f8;padding:12px;border-radius:6px;font-family:monospace}</style>
+        </head><body>
+        <h1>Apache fonctionne !</h1>
+        <p>Votre serveur Apache de test est opérationnel.</p>
+        <div class=\"sid\">Session : '"${SESSION_ID}"'</div>
+        <p style=\"margin-top:20px;color:#666\">
+        Modifiez <code>/usr/local/apache2/htdocs/</code> pour personnaliser.</p>
+        </body></html>\n' > /usr/local/apache2/htdocs/index.html &&
+        httpd-foreground
+      "
+    deploy:
+      resources:
+        limits:
+          cpus: "${CPU_LIMIT:-0.3}"
+          memory: "${MEM_LIMIT:-128m}"
+        reservations:
+          memory: "32m"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.app-${SESSION_ID}.rule=Host(`app-${SESSION_ID}.${APP_DOMAIN_SUFFIX:-${DOMAIN_SUFFIX}}`)"
+      - "traefik.http.routers.app-${SESSION_ID}.tls=false"
+      - "traefik.http.routers.app-${SESSION_ID}.entrypoints=web"
+      - "traefik.http.services.app-${SESSION_ID}.loadbalancer.server.port=80"
+      - "traefik.http.middlewares.app-${SESSION_ID}-sec.headers.contentTypeNosniff=true"
+      - "traefik.http.routers.app-${SESSION_ID}.middlewares=app-${SESSION_ID}-sec"
+
+networks:
+  session_internal:
+    driver: bridge
+  proxy:
+    external: true
+    name: proxy

@@ -1,0 +1,29 @@
+name: Linux — Ansible
+description: Shell, permissions, processus, systemd, réseau — environnement Debian 13
+category: formation
+access_mode: free
+
+ttl:
+  free: 1800
+  auth: 7200
+  premium: 14400
+
+resources:
+  free:
+    cpus: 0.5
+    memory: 256m
+  auth:
+    cpus: 1.0
+    memory: 512m
+  premium:
+    cpus: 1.0
+    memory: 512m
+
+quota:
+  free_per_ip: 3
+  auth_per_user: 10
+  premium_per_user: 0
+
+allow_internet: false
+
+start_timeout_s: 120

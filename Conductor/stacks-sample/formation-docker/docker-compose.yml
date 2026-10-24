@@ -1,0 +1,109 @@
+# Stack formation Docker
+#
+# Composants mutualisés (optionnels) :
+#   Activés via .env du conductor/agent → injectés automatiquement dans env_vars
+#   Le daemon dockerd les utilise via ses arguments (--registry-mirror, --dns)
+#   Pas besoin de réseau rdr-components ici — connexion via la pile réseau de l'hôte
+#   REGISTRY_MIRROR_ENABLED=true  → REGISTRY_MIRROR_URL injecté → --registry-mirror
+#   DNS_ADGUARD_ENABLED=true      → DNS_RESOLVER injecté      → --dns — DinD avec registry miroir et DNS AdGuard optionnels
+#
+# Variables optionnelles (passées via meta.yml ou env_vars du conductor) :
+#   REGISTRY_MIRROR_URL=http://registry-mirror:5000  → accélère les pulls (composant registry-mirror)
+#   DNS_RESOLVER=172.28.0.53                         → filtrage AdGuard (composant dns-adguard)
+#   DOCKER_MTU=1450                            → ajuster si réseau sous-jacent compresse
+
+services:
+
+  dind:
+    image: forge.rdr-it.com/registry/labs/dind/27-dind:latest
+    restart: "no"
+    privileged: true
+    hostname: docker-host
+    environment:
+      - DOCKER_TLS_CERTDIR=
+      # On passe les variables de l'Agent vers le container
+      - REGISTRY_MIRROR_URL=${REGISTRY_MIRROR_URL:-}
+      - REGISTRY_INSECURE=${REGISTRY_INSECURE:-}
+      - DNS_RESOLVER=${DNS_RESOLVER:-}
+      - DOCKER_MTU=${DOCKER_MTU:-1450}
+    networks:
+      session_internal:
+        aliases: [dind, docker]
+    tmpfs:
+      - /tmp:size=512m
+    volumes:
+      - dind_data:/var/lib/docker
+      - tp_data:/tp
+    deploy:
+      resources:
+        limits:
+          cpus: "${CPU_LIMIT:-2.0}"
+          memory: "${MEM_LIMIT:-1g}"
+    healthcheck:
+      #test: ["CMD", "docker", "-H", "tcp://localhost:2375", "info"]
+      test: ["CMD", "docker", "-H", "tcp://127.0.0.1:2375", "info"]
+      #test: ["CMD", "docker", "info"]
+      interval: 3s
+      timeout: 10s
+      retries: 20
+      start_period: 15s
+
+  terminal:
+    image: forge.rdr-it.com/registry/labs/terminal-server:latest
+    restart: "no"
+    depends_on:
+      dind:
+        #condition: service_healthy
+        condition: service_started
+    environment:
+      TERM_PORT:   "7681"
+      SESSION_ID: "${SESSION_ID}"
+      CONDUCTOR_INTERNAL_URL: "${CONDUCTOR_INTERNAL_URL}"
+      SESSION_TOKEN:          "${SESSION_TOKEN}"
+      TERM_SECURITY_REPORT:   "${TERM_SECURITY_REPORT}"
+      TERM_TITLE:  "RDR-IT — Docker TP"
+      DOCKER_HOST: "tcp://dind:2375"
+    networks:
+      - session_internal
+      - proxy
+      - rdr-reporting
+    volumes:
+      - tp_data:/tp
+    tmpfs:
+      - /tmp:size=64m
+      - /root:size=128m
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: "128m"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:7681/health"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.${SESSION_ID}.rule=Host(`${SESSION_ID}.${DOMAIN_SUFFIX}`)"
+      - "traefik.http.routers.${SESSION_ID}.tls=false"
+      - "traefik.http.routers.${SESSION_ID}.entrypoints=web"
+      - "traefik.http.services.${SESSION_ID}.loadbalancer.server.port=7681"
+      - "traefik.http.middlewares.${SESSION_ID}-sec.headers.customFrameOptionsValue=SAMEORIGIN"
+      - "traefik.http.middlewares.${SESSION_ID}-sec.headers.contentTypeNosniff=true"
+      - "traefik.http.routers.${SESSION_ID}.middlewares=${SESSION_ID}-sec"
+
+volumes:
+  dind_data:
+  tp_data:
+
+networks:
+  session_internal:
+    driver: bridge
+  proxy:
+    external: true
+    name: proxy
+  rdr-reporting:
+    name: rdr-reporting
+    external: true

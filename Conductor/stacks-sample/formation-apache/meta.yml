@@ -1,0 +1,12 @@
+name: App Apache — Site statique
+description: Hébergez un site statique Apache accessible publiquement — URL fournie à la fin du lancement
+category: app
+access_mode: free
+ttl:
+  free: 900
+  auth: 1800
+resources:
+  free:
+    cpus: "0.3"
+    memory: "128m"
+app_port: 80

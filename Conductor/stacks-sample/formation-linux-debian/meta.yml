@@ -1,0 +1,31 @@
+name: Linux — Administration système
+description: Shell, permissions, processus, systemd, réseau — environnement Ubuntu 22.04 complet
+category: formation
+access_mode: free
+
+ttl:
+  free: 1800
+  auth: 7200
+  premium: 14400
+
+resources:
+  free:
+    cpus: 0.5
+    memory: 256m
+  auth:
+    cpus: 1.0
+    memory: 512m
+  premium:
+    cpus: 1.0
+    memory: 512m
+
+quota:
+  free_per_ip: 2
+  auth_per_user: 10
+  premium_per_user: 0
+
+allow_internet: false
+
+prefetch:
+  - forge.rdr-it.com/registry/labs/debian13-ssh:latest
+  - forge.rdr-it.com/registry/labs/terminal-server:latest
