@@ -1,6 +1,6 @@
 services:
   uptime-kuma:
-    image: louislam/uptime-kuma:${UKUMA_VERSION:-2.2.1}
+    image: louislam/uptime-kuma:${UKUMA_VERSION:-2}
     networks:
       - uk-network
     volumes:
@@ -9,7 +9,7 @@ services:
       - '${UKUMA_PORT_EXPOSE:-3001}:3001'
     restart: unless-stopped
     env_file:
-      - uk.env
+      - uptime-kuma.env
     depends_on:
       - mariadb
     logging:

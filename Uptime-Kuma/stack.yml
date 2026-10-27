@@ -1,0 +1,71 @@
+app: 
+  name: Uptime Kuma
+  description: Uptime Kuma est un outil de supervision open-source, auto-hébergé et gratuit, conçu pour surveiller la disponibilité de vos services informatiques.
+  description_en: Uptime Kuma is a free, open-source, self-hosted monitoring tool designed to track the availability of your IT services.
+
+vars:
+  UKUMA_VERSION:
+    type: text
+    default: 2
+    label: Tag de imade Docker
+    label_en: Docker image tag
+    group: Uptime Kuma
+  UKUMA_PORT_EXPOSE:
+    type: port
+    default: 3001
+    label: Port qui expose le service Uptime Kuma depus l hote Docker
+    label_en: Port that exposes the Uptime Kuma service from the Docker host
+    group: Uptime Kuma
+  UK_LOGGIN_DRIVER:
+    type: select
+    options:
+      - { value: "none",          label: "local" }
+      - { value: "local",         label: "local" }
+      - { value: "json-file",     label: "json-file" }
+    default: none
+    required: true
+    group: Uptime Kuma
+  DB_ENGINE:
+    type: select
+    options:
+      - { value: "mariadb",       label: "mariadb" }
+      - { value: "mysql",         label: "mysql" }
+    default: mariadb
+    required: true
+    group: Databases
+  DB_VERSION:
+    type: text
+    default: 11
+    required: true
+    group: Databases
+  MYSQL_ROOT_PASSWORD:
+    type: secret
+    gen: alpha-24
+    required: true
+    group: Databases
+  MYSQL_DATABASE:
+    type: text
+    required: true
+    default: ukuma
+    group: Databases
+  MYSQL_USER:
+    type: text
+    required: true
+    default: ukuma
+    group: Databases
+  MYSQL_PASSWORD:
+    type: secret
+    gen: alpha-24
+    required: true
+    group: Databases
+  #
+  UPTIME_KUMA_DISABLE_FRAME_SAMEORIGIN:
+    type: bool 
+    default: false
+    description: Par défaut, Uptime Kuma n'est pas autorisé à s'afficher dans une iframe si le nom de domaine diffère de celui de la page parente. Cela empêche Uptime Kuma d'être utilisé dans le cadre d'un site de hameçonnage (phishing). Si vous n'avez pas besoin de cette protection, vous pouvez lui attribuer la valeur « true ».
+    description_en: By default, Uptime Kuma is not allowed in iframe if the domain name is not the same as the parent. It protects your Uptime Kuma to be a phishing website. If you don't need this protection, you can set it to true
+    service:
+      - uptime-kuma
+    group: Uptime Kuma 
+
+  
