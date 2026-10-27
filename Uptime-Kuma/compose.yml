@@ -28,9 +28,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-ukuma}
       MYSQL_USER: ${MYSQL_USER:-ukuma}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-changeme}
-    #ports:
-    #  - '${MYSQL_PORT_EXPOSE}:3306'
-
+      
 networks:
   uk-network:
     driver: bridge
